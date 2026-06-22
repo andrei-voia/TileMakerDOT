@@ -263,7 +263,7 @@ If you prefer visual learning, check out the official TileMaker DOT tutorial ser
 
 * [**Part 1: Getting Started with TileMaker DOT**](https://www.youtube.com/watch?v=Y0J-ezoVUCw&list=PLmIeW9QZsW_M4BuJoOmxTR5y6rK-N7W3D)
 * [**Part 2: World Building & Performance**](https://www.youtube.com/watch?v=atrQ6VdNxC0&list=PLmIeW9QZsW_M4BuJoOmxTR5y6rK-N7W3D&index=2)
-* [**Part 3: DarkMode & Dynamic Brushes**](https://www.youtube.com/watch?v=3fiajGU32Jg)
+* [**Part 3: DarkMode & Dynamic Brushes**](https://www.youtube.com/watch?v=3fiajGU32Jg&list=PLmIeW9QZsW_M4BuJoOmxTR5y6rK-N7W3D&index=3)
 
 ***
 
