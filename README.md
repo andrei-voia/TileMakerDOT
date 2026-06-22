@@ -261,8 +261,9 @@ This project manages dependencies manually rather than using a build tool like M
 
 If you prefer visual learning, check out the official TileMaker DOT tutorial series on YouTube. These videos cover everything from basic placement to advanced autotiling and export workflows.
 
-* 🎬 [**Getting Started with TileMaker DOT**](https://www.youtube.com/watch?v=Y0J-ezoVUCw&list=PLmIeW9QZsW_M4BuJoOmxTR5y6rK-N7W3D)
-* 🖌️ [**Advanced Painting: World Building & Performance**](https://www.youtube.com/watch?v=atrQ6VdNxC0&list=PLmIeW9QZsW_M4BuJoOmxTR5y6rK-N7W3D&index=2)
+* [**Part 1: Getting Started with TileMaker DOT**](https://www.youtube.com/watch?v=Y0J-ezoVUCw&list=PLmIeW9QZsW_M4BuJoOmxTR5y6rK-N7W3D)
+* [**Part 2: World Building & Performance**](https://www.youtube.com/watch?v=atrQ6VdNxC0&list=PLmIeW9QZsW_M4BuJoOmxTR5y6rK-N7W3D&index=2)
+* [**Part 3: DarkMode & Dynamic Brushes**](https://www.youtube.com/watch?v=3fiajGU32Jg)
 
 ***
 
