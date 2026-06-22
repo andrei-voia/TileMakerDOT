@@ -233,7 +233,6 @@ TileMaker DOT/
 
 ***
 
-Markdown
 ## 💻 Building from Source
 
 If you want to modify the code or contribute to TileMaker DOT, follow these steps to set up the workspace.
@@ -255,6 +254,8 @@ This project manages dependencies manually rather than using a build tool like M
    * Select **Classpath** > **Add JARs...** 
    * Navigate to the project's `lib/` folder and select `flatlaf-3.5.4.jar`.
 5. Run the main class to launch the editor.
+
+***
 
 ## 📺 Learning Resources
 
