@@ -197,7 +197,7 @@ TileMaker DOT features a **Live-Sync Settings System**. While you can manually e
 
 ## 📂 Application Structure
 
-The application requires a strict file structure to function correctly:[cite: 1]
+The application requires a strict file structure to function correctly:
 
 ```text
 TileMaker DOT/
