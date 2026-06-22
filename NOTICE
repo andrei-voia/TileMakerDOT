@@ -1,0 +1,11 @@
+
+---------------------------------------------------------
+THIRD-PARTY SOFTWARE NOTICES
+---------------------------------------------------------
+
+TileMaker DOT uses the following third-party components:
+
+FlatLaf (Copyright 2019-2024 FormDev Software GmbH)
+Used specifically for the Dark Mode user interface implementation.
+Licensed under the Apache License, Version 2.0:
+http://www.apache.org/licenses/LICENSE-2.0
