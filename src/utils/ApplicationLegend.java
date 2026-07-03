@@ -69,6 +69,7 @@ public class ApplicationLegend {
                         
             <font size='5'><b>🖌️ Tools Menu:</b></font>
             <ul>
+            <li><b>Annotated Notes Tool</b> → Place custom color coded map markers with custom labels to flag boundaries, write script reminders, or map out level design notes directly on the grid</li>
             <li><b>Custom Objects Scatter Brush</b> → Paint multiple different objects randomly at once in the selected area</li>
         	             Note: Select (Ctrl + LClick) objects in the 'Objects' palette first to add them to your brush
             <li><b>Spread</b> → Distribute objects across a wider area with variable density</li>
@@ -96,6 +97,7 @@ public class ApplicationLegend {
             <li><b>Toggle Cursor Position</b> → Show/hide the tile coordinates at mouse pointer</li>
             <li><b>Toggle Live Placement</b> → Show/hide the item preview before placing on the map</li>
             <li><b>Toggle Autotile</b> → Show/hide the automatic border and corner correction</li>
+            <li><b>Toggle Annotated Notes</b> → Show/hide placed annotation notes and markers on the map</li>
             <li><b>Preview Night Mode</b> → Show/hide simulated night time lighting on the map</li>
             </ul>
             

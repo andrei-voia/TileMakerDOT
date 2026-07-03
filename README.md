@@ -49,6 +49,7 @@ TileMaker DOT addresses common limitations found in traditional map editors by o
 | **User Experience**      | A streamlined and intuitive interface makes the application significantly easier to use than similar complex tools. Reduces the learning curve and speeds up map creation for the end-user. |
 | **Asset Filtering**      | Selective ID Loading: Only imports assets defined in a specific whitelist file.             | Prevents workspace clutter and memory overhead by excluding unused or legacy textures without needing to delete files. |
 | **Spritesheet Slicer**   | Import a full sheet and cut it into individual assets without leaving the app.              | Eliminates the need for external image editors and automatically handles file saving and ID assignment in one workflow. |
+| **Annotated Notes**      | Place persistent, color-coded pins directly onto map tiles to leave design memos, boundary and script reminders, or map out level design notes. | Keeps level design ideas, collaboration notes, and scripting instructions attached directly to the map canvas, scaling perfectly during meetings and game development. |
 ***
 
 ***
@@ -124,17 +125,17 @@ Select multiple items in the palette to activate **Brush Mode**. The editor will
 
 ### 📦 Chunk Selection Tool
 Enable the **Chunk Tool** to click and drag a rectangle over the canvas. 
-**Export:** Save the selected area as a standalone `.tmdot` file.
-**Import:** "Stamp" a saved chunk into any other map.
+* **Export:** Save the selected area as a standalone `.tmdot` file.
+* **Import:** "Stamp" a saved chunk into any other map.
 
 ### 🤖 Auto-ID Assistant
 Press **F4** to trigger the ID Assistant. It automatically scans your asset folders for files missing numeric prefixes and assigns them the next available unique ID based on your project structure.
 
 ### 🖼️ Spritesheet Importer
 Access via `File > Import Spritesheet`. This tool allows you to take a large composite image (like a 1024x1024 sheet) and slice it into individual PNGs directly into your project folders.
-**Smart History:** Previously imported areas are highlighted in **Green**, so you never export the same sprite twice.
-**Auto-ID:** The tool automatically suggests the next available ID for the chosen folder (Tiles, Objects, or NPCs).
-**Navigation:**
+* **Smart History:** Previously imported areas are highlighted in **Green**, so you never export the same sprite twice.
+* **Auto-ID:** The tool automatically suggests the next available ID for the chosen folder (Tiles, Objects, or NPCs).
+* **Navigation:**
 	* `Right Click + Drag` to Pan.
     * `Mouse Wheel` to Zoom.
     * `Left Click + Drag` to select your crop area.
@@ -154,6 +155,12 @@ To enable autotiling for a set of textures, place the texture image in the `asse
 TileMaker DOT features a fully integrated **Light Mode** and **Dark Mode** implementation. 
 **Dynamic Theming:** The interface, including the **Legend** and **About** tabs, automatically adapts its color palette to reduce eye strain.
 **Smart Persistence:** Your theme preference is saved locally. If you switch to Dark Mode, the app will remember your choice the next time you launch.
+
+## 📝 Annotated Notes Layer
+Activate the **Annotated Notes Tool** from the `Tools > Annotated Notes Tool` to place custom color-coded map markers with custom descriptions directly on the map grid.
+* **Persistent Reminders:** Perfect for flagging collision boundaries, writing scripting memos, or planning out area specific level design notes.
+* **Smart Zoom Scaling:** Notes calculate their position dynamically relative to your pan offsets and keep a consistent pixel size so they remain perfectly readable no matter how far you zoom in or out.
+* **Color Customization:** Use the pop-up configuration panel to select custom enum based label colors with automatic UI live previews.
 
 ***
 

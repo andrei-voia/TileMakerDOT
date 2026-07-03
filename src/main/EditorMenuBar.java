@@ -460,7 +460,7 @@ public class EditorMenuBar {
         notesToolItem.addActionListener(e -> {
         	canvas.setNotesTool();
         	if(canvas.getSelected().isNotesTool()) {
-        		canvas.getToastNotification().showToastNotification("Notes Tool Active!");
+        		canvas.getToastNotification().showToastNotification("Notes tool Active..");
         	}
         	else {
         		canvas.getToastNotification().showToastNotification("Notes tool Off..");
@@ -687,8 +687,8 @@ public class EditorMenuBar {
         viewMenu.add(toggleObjectPlacerPreview);
         viewMenu.add(toggleAutotile);
         viewMenu.addSeparator();
-        viewMenu.add(toggleNightMode);
         viewMenu.add(toggleNotesMap);
+        viewMenu.add(toggleNightMode);
         
         //info menu
         JMenu helpMenu = new JMenu("Info");
