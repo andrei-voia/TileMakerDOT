@@ -16,6 +16,7 @@ public class EditorIcons {
 	private BufferedImage iconImage;
 	
     private ImageIcon eraserIcon;
+    private ImageIcon noteIcon;
     private BufferedImage notFoundIcon;
     private BufferedImage deleteImage;
     private BufferedImage objectPickerImage;
@@ -46,6 +47,10 @@ public class EditorIcons {
             Image scaledEraser = eraserImage.getScaledInstance(defaultSelectedTile, defaultSelectedTile, Image.SCALE_SMOOTH);
             this.eraserIcon = new ImageIcon(scaledEraser);
             
+            //load the entire note icon
+            this.noteIcon = new ImageIcon(ImageIO.read(new File(Utils.DEFAULT_BASE_PATH, "/icons/note_icon.png"))
+            		.getScaledInstance(defaultSelectedTile, defaultSelectedTile, Image.SCALE_SMOOTH));
+            
         } catch (IOException e) {
             System.err.println("Could not load application icon: " + e.getMessage());
             //the application will still run without the icon
@@ -58,6 +63,10 @@ public class EditorIcons {
 
 	public ImageIcon getEraserIcon() {
 		return eraserIcon;
+	}
+	
+	public ImageIcon getNoteIcon() {
+		return noteIcon;
 	}
 
 	public BufferedImage getNotFoundIcon() {

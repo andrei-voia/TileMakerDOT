@@ -11,7 +11,9 @@ import java.util.Set;
 import javax.swing.JOptionPane;
 
 import data.CanvasViewState;
+import data.MapNote;
 import data.MapState;
+import data.NoteColor;
 import tools.ChunkSelectionTool;
 import utils.Utils;
 import view.CanvasRenderer;
@@ -121,23 +123,26 @@ public class MapLoader {
 			//here we reset the current maps to the new loaded file sizes
 			mapState.getData().cleanMap();
 
-			//read tile Layer
+			//read tile layer
 			readLayer(br, mapState.getData().getTileMap(), 
 					mapState.getData().getRows(), 
 					mapState.getData().getCols(), TILE_LAYER);
-			//read object Layer
+			//read object layer
 			readLayer(br, mapState.getData().getObjectMap(), 
 					mapState.getData().getRows(), 
 					mapState.getData().getCols(), OBJECT_LAYER);
-			//read NPC Layer
+			//read NPC layer
 			readLayer(br, mapState.getData().getNpcMap(), 
 					mapState.getData().getRows(), 
 					mapState.getData().getCols(), NPC_LAYER);
-			//read NPC Walk Area Layer
+			//read NPC walk area layer
 			readLayer(br, mapState.getData().getNpcWalkAreaMap(), 
 					mapState.getData().getRows(), 
 					mapState.getData().getCols(), NPC_WALK_AREA_LAYER);
 
+			//read the annotation notes layer
+			readAnnotationNotes(br);
+			
 			//save new cached location from last loaded file
 			mapState.getCacheData().setCachedSavedLocation(file);
 			mapState.getCacheData().setCanQuickSave(false);
@@ -169,6 +174,48 @@ public class MapLoader {
 			JOptionPane.showMessageDialog(null, "Map file contains non-numeric data.", "Load Error",
 					JOptionPane.ERROR_MESSAGE);
 			System.exit(0);
+		}
+	}
+	
+	private void readAnnotationNotes(BufferedReader br) throws IOException {
+		//clear the array of previous annotation notes if exists from previous session
+		if (tileCanvas.getAnnotatedNotesTool() != null) {
+			tileCanvas.getAnnotatedNotesTool().getMapNotes().clear();
+
+			String line;
+			while ((line = br.readLine()) != null) {
+				line = line.trim();
+				
+				if (line.isEmpty()) {
+					continue;
+				}
+				
+				//split by comma up to 4 parts ensuring custom notes with commas inside works
+				String[] tokens = line.split(",", 4);
+				if (tokens.length >= 4) {
+					try {
+						int col = Integer.parseInt(tokens[0].trim());
+						int row = Integer.parseInt(tokens[1].trim());
+
+						//build the NoteColor enum instance safely matching by name
+						NoteColor noteColor;
+						try {
+							noteColor = NoteColor.valueOf(tokens[2].trim());
+						} catch (IllegalArgumentException e) {
+							noteColor = NoteColor.YELLOW; //fallback to a default value
+						}
+
+						String textMessage = tokens[3];
+
+						//add new notes to the list of active notes
+						tileCanvas.getAnnotatedNotesTool().getMapNotes()
+								.add(new MapNote(col, row, textMessage, noteColor));
+					} catch (NumberFormatException e) {
+						System.err.println(
+								"Note parsing skipped: invalid row/col structure inside row line: " + line);
+					}
+				}
+			}
 		}
 	}
 

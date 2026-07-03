@@ -15,7 +15,9 @@ import javax.swing.JOptionPane;
 import core.Tile;
 import core.TileObject;
 import data.CanvasViewState;
+import data.MapNote;
 import data.MapState;
+import data.NoteColor;
 import tools.ChunkSelectionTool;
 import utils.ImageUtils;
 import utils.Utils;
@@ -78,7 +80,7 @@ public class MapExporter {
 		
 		//determine the file extension
 		file = Utils.addFileType(file, Utils.SAVE_MAP_EXTENSION);
-
+		
 		//use PrintWriter to write human readable text
 		try (PrintWriter pw = new PrintWriter(new FileOutputStream(file))) {
 			//write dimensions
@@ -139,7 +141,27 @@ public class MapExporter {
 				}
 				pw.println(sb.toString());
 			}
-
+			
+			//write the annotated notes if they exist
+	        if (tileCanvas.getAnnotatedNotesTool() != null) {
+	            List<MapNote> mapNotes = tileCanvas.getAnnotatedNotesTool().getMapNotes();
+	            if (mapNotes != null && !mapNotes.isEmpty()) {
+	                pw.println("# Annotated Notes");
+	                for (MapNote note : mapNotes) {
+	                    //safe string representation fallback for the color enum structure
+	                    String colorEnumName = (note.getColor() != null) ? note.getColor().name() : NoteColor.YELLOW.name();
+	                    
+	                    //format output line is: col,row,color,text
+	                    pw.println(String.format("%d,%d,%s,%s", 
+	                        note.getCol(), 
+	                        note.getRow(), 
+	                        colorEnumName, 
+	                        note.getText()
+	                    ));
+	                }
+	            }
+	        }
+	        
 			//save new cached location from last loaded file
 			mapState.getCacheData().setCachedSavedLocation(file);
 			mapState.getCacheData().setCanQuickSave(false);

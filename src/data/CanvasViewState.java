@@ -14,6 +14,7 @@ public class CanvasViewState {
 	private Point objectPreviewPosition = null;
 	private boolean locateMode = false;
 	private boolean nightMode = false;
+	private boolean showNotesTool = true;
 	
 	public void toggleNightMode() {
 		nightMode = !nightMode;
@@ -49,6 +50,10 @@ public class CanvasViewState {
 
 	public void toggleAutotile() {
 		showAutotile = !showAutotile;
+	}
+	
+	public void toggleNotesTool() {
+		showNotesTool = !showNotesTool;
 	}
 	
 	public boolean isShowGrid() {
@@ -129,5 +134,13 @@ public class CanvasViewState {
 	
 	public void setNightMode(boolean nightMode) {
 		this.nightMode = nightMode;
+	}
+
+	public boolean isShowNotesTool() {
+		return showNotesTool;
+	}
+
+	public void setShowNotesTool(boolean showNotesTool) {
+		this.showNotesTool = showNotesTool;
 	}
 }

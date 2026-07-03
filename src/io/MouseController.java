@@ -7,12 +7,16 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.Iterator;
 
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import core.ItemType;
 import core.TileObject;
 import data.CanvasViewState;
+import data.MapNote;
 import data.MapState;
+import data.NoteColor;
+import data.ButtonsOptions;
 import tools.BrushTool;
 import tools.ChunkSelectionTool;
 import tools.HistoryFunction;
@@ -72,7 +76,8 @@ public class MouseController extends MouseAdapter {
 		tileCanvas.getCanvasRenderer().requestFocusInWindow();
 		
 		//tile picking
-		if (SwingUtilities.isRightMouseButton(e) && (e.isShiftDown() || e.isControlDown())) {
+		if (SwingUtilities.isRightMouseButton(e) && (e.isShiftDown() || e.isControlDown()) &&
+				!tileCanvas.getSelected().isNotesTool()) {
 			pickTileOrObject(e.getX(), e.getY());
 			//execute picking and stop processing the click
 			return;
@@ -92,6 +97,13 @@ public class MouseController extends MouseAdapter {
 			
 			if (row < 0 || row >= mapState.getData().getRows() || col < 0 || col >= mapState.getData().getCols())
 				return;
+			
+			//add annotations to the map by left clicking it when active
+			if(tileCanvas.getSelected().isNotesTool()) {
+				updateAnnotatedNotes(e, col, row);
+				tileCanvas.getCanvasRenderer().repaint();
+				return;
+			}
 			
 		    //drag and drop and grab if clicking on an existing NPC or Object while in the correct mode
 		    if (!tileCanvas.getSelected().isChunkSelectionTool() && !e.isShiftDown() && !e.isAltDown()) {
@@ -153,6 +165,7 @@ public class MouseController extends MouseAdapter {
 					isPlacingSingleItem = true;
 				}
 			}
+			
 			tileCanvas.getCanvasRenderer().repaint();
 		}
 	}
@@ -518,6 +531,61 @@ public class MouseController extends MouseAdapter {
 	    
 	    //no object found at the specified coordinates
 	    return false;
+	}
+	
+	private void updateAnnotatedNotes(MouseEvent e, int col, int row) {
+		//search first to see if a note already exists in the given position
+		MapNote existingNote = tileCanvas.getAnnotatedNotesTool().findNoteAt(col, row);
+
+		String defaultText = (existingNote != null) ? existingNote.getText() : "";
+		NoteColor defaultColor = (existingNote != null) ? existingNote.getColor() : null;
+
+		//instantiate the UI configuration window panel
+		NoteConfigPanel configPanel = new NoteConfigPanel(defaultText, defaultColor);
+
+		//define dynamic button options based on context
+		Object[] options;
+		if (existingNote != null) {
+			options = new Object[] {ButtonsOptions.Save, ButtonsOptions.Remove};
+		} else {
+			options = new Object[] {ButtonsOptions.Save, ButtonsOptions.Cancel};
+		}
+
+	    int result = JOptionPane.showOptionDialog(
+	    	SwingUtilities.getWindowAncestor(e.getComponent()),
+	      	configPanel,
+	      	"Configure Editor Pin",
+	      	JOptionPane.DEFAULT_OPTION,
+	       	JOptionPane.PLAIN_MESSAGE,
+	       	null,
+	       	options,
+	       	options[0]); //default focused button
+
+		//process the new notes list according to the options selected in the window panel
+	 	if (existingNote != null) {
+	      	if (result == 0 && !configPanel.getNoteText().isEmpty()) { //save clicked
+	          	existingNote.setText(configPanel.getNoteText());
+	           	existingNote.setColor(configPanel.getSelectedColor());
+	          	tileCanvas.getToastNotification().showToastNotification("Note saved successfully!");
+	          	enableQuickSave();
+	       	} else if (result == 1) { //remove clicked
+	          	tileCanvas.getAnnotatedNotesTool().removeMapNote(existingNote);
+	           	tileCanvas.getToastNotification().showToastNotification("Note removed.");
+	          	enableQuickSave();
+	      	}
+		} else if (result == 0 && !configPanel.getNoteText().isEmpty()) { //save clicked for new note
+			tileCanvas.getAnnotatedNotesTool().addNote(col, row, configPanel.getNoteText(), configPanel.getSelectedColor());
+	      	tileCanvas.getToastNotification().showToastNotification("Note saved successfully!");
+	    	enableQuickSave();
+	  	}
+	}
+	
+	//set the quick save button to be available every time you modify the notes list
+	private void enableQuickSave() {
+        mapState.getCacheData().setCanQuickSave(true);
+		if(tileCanvas.getTileEditor().getStatusInfoBar() != null) {
+			tileCanvas.getTileEditor().getStatusInfoBar().updateStatusUI();
+		}
 	}
 
 	public Point getDragStartPoint() {

@@ -19,6 +19,7 @@ import io.MapExporter;
 import io.MapLoader;
 import io.MouseController;
 import main.TileEditor;
+import tools.AnnotatedNotesTool;
 import tools.BrushTool;
 import tools.ChunkSelectionTool;
 import tools.ExtendMapTool;
@@ -54,6 +55,9 @@ public class TileCanvas {
 	
 	//used to extend or shrink the map in any of the 4 directions
 	private ExtendMapTool extendMapTool;
+	
+	//used to add annotations to the map for the end user to take notes
+	private AnnotatedNotesTool annotatedNotesTool;
 	
 	//current selection and index in allTiles, allObjects, allNpcs (-1: none)
 	private Selection selected = new Selection(ItemType.TILE, 0);
@@ -107,6 +111,8 @@ public class TileCanvas {
 		
 		extendMapTool = new ExtendMapTool(mapState, historyFunction, camera, 
 				canvasViewState, canvasRenderer, keyController);
+		
+		annotatedNotesTool = new AnnotatedNotesTool();
 		
 		toastNotification = new ToastNotification(canvasRenderer);
 		toastNotification.initToastNotification();
@@ -340,6 +346,20 @@ public class TileCanvas {
 		canvasRenderer.repaint();
 	}
 	
+	public void setNotesTool() {
+		//exit notes tool when you press again
+		if(selected.isNotesTool()) {
+			backToSavedSelected();
+		}
+		//if not notes tool already, then set to notes tool
+		else {
+			selected.setNotesTool();
+		}
+		
+		tileEditor.getStatusInfoBar().updateStatusUI();
+		canvasRenderer.repaint();
+	}
+	
 	//used to go back to the saved selected value before switching to something else
 	private void backToSavedSelected() {
 		if(saveSelected.getType() == ItemType.TILE) {
@@ -422,5 +442,9 @@ public class TileCanvas {
 
 	public ChunkSelectionTool getChunkSelectionTool() {
 		return chunkSelectionTool;
+	}
+
+	public AnnotatedNotesTool getAnnotatedNotesTool() {
+		return annotatedNotesTool;
 	}
 }

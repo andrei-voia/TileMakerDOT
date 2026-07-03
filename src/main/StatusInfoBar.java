@@ -69,6 +69,10 @@ public class StatusInfoBar {
         	icon = tileEditor.getEditorIcons().getEraserIcon();
             modeText = "Erase Object / NPC Mode";
         }
+        else if (selection.isNotesTool()) {
+        	icon = tileEditor.getEditorIcons().getNoteIcon();
+            modeText = "Annotated Notes Mode";
+        }
         else if (selection.isObjectMode()) {
             Tile obj = this.canvas.getMapState().findObjectById(selection.getIndex());
         	icon = ImageUtils.createScaledIcon(obj.getImage(), tileEditor.getLoadedSetup().getDefaultSelectedTile(), tileEditor.getLoadedSetup().getDefaultSelectedTile());

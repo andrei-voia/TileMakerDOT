@@ -9,5 +9,6 @@ public enum ItemType {
 	NPC_WALK_AREA_MODE,
 	BRUSH_TOOL,
 	CHUNK_SELECTION_TOOL,
+	NOTES_TOOL,
 	NONE
 }

@@ -12,6 +12,7 @@ import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -19,6 +20,8 @@ import core.ItemType;
 import core.Tile;
 import core.TileObject;
 import data.CanvasViewState;
+import data.MapNote;
+import data.NoteColor;
 import data.Selection;
 import data.SelectionDragged;
 import utils.Utils;
@@ -280,8 +283,8 @@ public class CanvasRenderer extends JPanel {
         //show preview of object / NPC / tile you want to paint on screen
         if(canvasViewState.isShowObjectPreview() && canvasViewState.getObjectPreviewPosition() != null 
         		&& tileCanvas.getMouseController().getDragStartPoint() == null && (!tileCanvas.getKeyController().isShiftPressed() && !tileCanvas.getKeyController().isCtrlPressed())
-        		&& tileCanvas.getMouseController().getSelectionStartPoint() == null && selected.isEraseMode() == false &&
-        		selected.isChunkSelectionTool() == false) {
+        		&& tileCanvas.getMouseController().getSelectionStartPoint() == null && selected.isEraseMode() == false 
+        		&& selected.isChunkSelectionTool() == false) {
         	
         	int posY = (int) canvasViewState.getObjectPreviewPosition().getY();
         	int posX = (int) canvasViewState.getObjectPreviewPosition().getX();
@@ -345,6 +348,32 @@ public class CanvasRenderer extends JPanel {
         				posY * tileSize, 
         				posX * tileSize, 
         				tile.getImage().getWidth(), tile.getImage().getHeight(), this);
+        	}
+            //show notes preview
+        	else if(selected.isNotesTool()) {
+            	//temporarily reset transform to switch into viewport screen space
+            	AffineTransform mapTransform = g2d.getTransform();
+            	g2d.setTransform(viewportTransform);
+            	
+            	//calculate the raw map center coordinates of this tile, not zoomed and not panned
+            	int mapTileCenterX = (posY * tileSize) + (tileSize / 2);
+            	int mapTileCenterY = (posX * tileSize) + (tileSize / 2);
+
+            	//convert map coordinates to exact screen pixel coordinates
+            	double zoom = tileCanvas.getCamera().getZoomLevel();
+            	Point offset = tileCanvas.getCamera().getViewOffset();
+            	final int fixedPinSize = 25;
+            	
+            	int screenX = (int) (mapTileCenterX * zoom) + offset.x;
+            	int screenY = (int) (mapTileCenterY * zoom) + offset.y;
+
+                int offsetX = screenX - (fixedPinSize / 2);
+                int offsetY = screenY - (fixedPinSize / 2);
+                
+                drawNoteColorCircle(g2d, offsetX, offsetY, NoteColor.YELLOW, fixedPinSize);
+
+                //restore matrix state for the items that are next to render
+                g2d.setTransform(mapTransform);
         	}
         	
         	g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
@@ -443,6 +472,11 @@ public class CanvasRenderer extends JPanel {
             g2d.setStroke(oldStroke);
         }
         
+        //here we draw the annotation notes on the screen
+        if (canvasViewState.isShowNotesTool()) {
+        	renderAnnotatedNotes(g2d, viewportTransform, startCol, startRow, endCol, endRow);
+        }
+        
         //render the toast message notifications
         if (tileCanvas.getToastNotification().getCurrentToastMessage() != null) {
             //save the current transformation state which includes pan / zoom
@@ -521,6 +555,107 @@ public class CanvasRenderer extends JPanel {
 	        //restore
 	        g2d.setTransform(mapTransform);
 	    }
+	}
+	
+	private void renderAnnotatedNotes(Graphics2D g2d, AffineTransform viewportTransform,
+			int startCol, int startRow, int endCol, int endRow) {
+		List<MapNote> mapNotes = tileCanvas.getAnnotatedNotesTool().getMapNotes();
+        
+		//make the circle line not pixel like
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        
+        //size of the circle note
+        final int fixedPinSize = 25;
+        final int offsetRenderAreaTile = 10;
+
+        for (MapNote note : mapNotes) {
+            if (note.getCol() >= startCol - offsetRenderAreaTile && note.getCol() < endCol + offsetRenderAreaTile &&
+                note.getRow() >= startRow - offsetRenderAreaTile && note.getRow() < endRow + offsetRenderAreaTile) {
+                
+            	//temporarily reset transform to switch into viewport screen space
+            	AffineTransform mapTransform = g2d.getTransform();
+            	g2d.setTransform(viewportTransform);
+            	
+            	//calculate the raw map center coordinates of this tile, not zoomed and not panned
+            	int mapTileCenterX = (note.getCol() * tileSize) + (tileSize / 2);
+            	int mapTileCenterY = (note.getRow() * tileSize) + (tileSize / 2);
+
+            	//convert map coordinates to exact screen pixel coordinates
+            	double zoom = tileCanvas.getCamera().getZoomLevel();
+            	Point offset = tileCanvas.getCamera().getViewOffset();
+
+            	int screenX = (int) (mapTileCenterX * zoom) + offset.x;
+            	int screenY = (int) (mapTileCenterY * zoom) + offset.y;
+            	
+                int offsetX = screenX - (fixedPinSize / 2);
+                int offsetY = screenY - (fixedPinSize / 2);
+                
+                NoteColor noteColor = drawNoteColorCircle(g2d, offsetX, offsetY, note.getColor(), fixedPinSize);
+
+                //draw note text description
+                String textMessage = note.getText();
+                if (textMessage != null && !textMessage.trim().isEmpty()) {
+                	//make the description capped shorter for preview
+                    if (textMessage.length() > 22) {
+                        textMessage = textMessage.substring(0, 19) + "...";
+                    }
+                    
+                    g2d.setFont(new Font("Arial", Font.PLAIN, 14));
+                    FontMetrics textFm = g2d.getFontMetrics();
+                    int textWidth = textFm.stringWidth(textMessage);
+                    int textHeight = textFm.getHeight();
+                    
+                    int rectX = screenX - (textWidth / 2) - 5;
+                    int rectY = offsetY + fixedPinSize + 4;
+                    
+                    g2d.setColor(new Color(25, 25, 25, 210)); 
+                    g2d.fillRoundRect(rectX, rectY, textWidth + 10, textHeight + 3, 5, 5);
+                    
+                    g2d.setColor(noteColor.getColorRGBA());
+                    g2d.drawRoundRect(rectX, rectY, textWidth + 10, textHeight + 3, 5, 5);
+                    
+                    g2d.setColor(new Color(240, 240, 240));
+                    g2d.drawString(textMessage, rectX + 5, rectY + textFm.getAscent() + 1);
+                }
+                
+                //restore matrix state for the items that are next to render
+                g2d.setTransform(mapTransform);
+            }
+        }
+	}
+	
+	private NoteColor drawNoteColorCircle(Graphics2D g2d, int offsetX, int offsetY, NoteColor color, int fixedPinSize) {
+        //draw margin shadow around the circle
+        g2d.setColor(new Color(20, 20, 20, 160));
+        g2d.fillOval(offsetX - 2, offsetY - 2, fixedPinSize + 4, fixedPinSize + 4);
+        
+        //draw note pin circle
+        NoteColor noteColor = color;
+        if (noteColor == null) {
+            noteColor = NoteColor.YELLOW; 
+        }
+        g2d.setColor(noteColor.getColorRGBA());
+        g2d.fillOval(offsetX, offsetY, fixedPinSize, fixedPinSize);
+        
+        //center the N identifier letter from notes
+        g2d.setFont(new Font("Arial", Font.BOLD, 12));
+        FontMetrics badgeFm = g2d.getFontMetrics();
+        
+        if (noteColor.getColorRGBA().getRed() > 200 && 
+        		noteColor.getColorRGBA().getGreen() > 200 && 
+        		noteColor.getColorRGBA().getBlue() > 200) {
+            g2d.setColor(new Color(30, 30, 30));
+        } else {
+            g2d.setColor(Color.WHITE);
+        }
+        
+        String noteLabel = "N";
+        int labelX = offsetX + (fixedPinSize - badgeFm.stringWidth(noteLabel)) / 2;
+        int labelY = offsetY + ((fixedPinSize - badgeFm.getHeight()) / 2) + badgeFm.getAscent();
+        g2d.drawString(noteLabel, labelX, labelY);
+        
+        return noteColor;
 	}
 	
 	private BufferedImage getTintedImage(BufferedImage originalImage, Color tintColor, float alpha) {

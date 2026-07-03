@@ -454,6 +454,20 @@ public class EditorMenuBar {
         	}
         });
         
+        JMenuItem notesToolItem = new JMenuItem("Annotated Notes Tool");
+        notesToolItem.setToolTipText("Click on the map grid to add or edit visual text reminders");
+        notesToolItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
+        notesToolItem.addActionListener(e -> {
+        	canvas.setNotesTool();
+        	if(canvas.getSelected().isNotesTool()) {
+        		canvas.getToastNotification().showToastNotification("Notes Tool Active!");
+        	}
+        	else {
+        		canvas.getToastNotification().showToastNotification("Notes tool Off..");
+        	}
+        });
+        
+        toolsMenu.add(notesToolItem);
         toolsMenu.add(scatterBrushItem);
         toolsMenu.add(sliderPanel);
         toolsMenu.add(cleanBrushItem);
@@ -551,7 +565,21 @@ public class EditorMenuBar {
         		canvas.getToastNotification().showToastNotification("Preview night mode Off..");
         	}
         });
-
+        
+        JMenuItem toggleNotesMap = new JMenuItem("Toggle Annotated Notes");
+        toggleNotesMap.setToolTipText("Show the notes added on the map");
+        toggleNotesMap.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_DOWN_MASK));
+        toggleNotesMap.addActionListener(e -> {
+        	canvas.getCanvasViewState().toggleNotesTool();
+        	canvas.getCanvasRenderer().repaint();
+        	if(canvas.getCanvasViewState().isShowNotesTool()) {
+        		canvas.getToastNotification().showToastNotification("Preview annotated notes On..");
+        	}
+        	else {
+        		canvas.getToastNotification().showToastNotification("Preview annotated notes Off..");
+        	}
+        });
+        
         JMenuItem toggleGridItem = new JMenuItem("Toggle Grid");
         toggleGridItem.setToolTipText("Show or hide the grid lines on the canvas");
         toggleGridItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, 0));
@@ -660,6 +688,7 @@ public class EditorMenuBar {
         viewMenu.add(toggleAutotile);
         viewMenu.addSeparator();
         viewMenu.add(toggleNightMode);
+        viewMenu.add(toggleNotesMap);
         
         //info menu
         JMenu helpMenu = new JMenu("Info");

@@ -43,6 +43,11 @@ public class Selection {
 		this.index = -2;
 	}
 	
+	public void setNotesTool() {
+		this.type = ItemType.NOTES_TOOL;
+		this.index = -1;
+	}
+	
 	public void setNpcWalkAreaMode() {
 		this.type = ItemType.NPC_WALK_AREA_MODE;
 		this.index = 1;
@@ -77,6 +82,10 @@ public class Selection {
 	
 	public boolean isEraseMode() {
 		return this.type == ItemType.ERASE_MODE;
+	}
+	
+	public boolean isNotesTool() {
+		return this.type == ItemType.NOTES_TOOL;
 	}
 	
 	public boolean isNpcWalkAreaMode() {
