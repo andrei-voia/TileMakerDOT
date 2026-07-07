@@ -6,6 +6,15 @@ bin/
 .settings/
 .classpath
 .project
+.metadata/
+
+# Gradle build files
+.gradle/
+build/
+
+# IntelliJ IDEA specific files
+.idea/
+*.iml
 
 # Packaged/Compiled archives
 *.exe

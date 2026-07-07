@@ -19,6 +19,9 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
+import utils.ImageUtils;
+import utils.OSDetector;
+
 public class EditorWindow {
 	
 	private TileEditor tileEditor;
@@ -76,7 +79,12 @@ public class EditorWindow {
 
         //panel for assets path input
         JPanel pathPanel = new JPanel(new BorderLayout(5, 5));
-        pathPanel.add(new JLabel("Enter Asset Base Path (e.g. assets or C:/MyAssets):"), BorderLayout.NORTH);
+        String osExample = switch (OSDetector.detectOS()) {
+            case "Windows" -> "C:/MyAssets";
+            case "macOS" -> "/Users/name/MyAssets";
+            default -> "/home/name/MyAssets";
+        };
+        pathPanel.add(new JLabel("Enter Asset Base Path (e.g. assets or " + osExample + "):"), BorderLayout.NORTH);
         
         //add a button to open a JFileChooser for the directory
         JButton browseButton = new JButton("Browse...");
@@ -114,13 +122,16 @@ public class EditorWindow {
         dialogPanel.add(mainInputPanel, BorderLayout.NORTH);
         dialogPanel.add(optionsPanel, BorderLayout.CENTER);
 
-        int result = JOptionPane.showConfirmDialog(
-            null,
+        JOptionPane optionPane = new JOptionPane(
             dialogPanel,
-            "Map Dimensions and Settings",
-            JOptionPane.OK_CANCEL_OPTION,
-            JOptionPane.PLAIN_MESSAGE
+            JOptionPane.PLAIN_MESSAGE,
+            JOptionPane.OK_CANCEL_OPTION
         );
+        JDialog dialog = optionPane.createDialog(null, "Map Dimensions and Settings");
+        dialog.setIconImage(ImageUtils.loadIconImage());
+        dialog.setVisible(true);
+
+        int result = (optionPane.getValue() instanceof Integer) ? (int) optionPane.getValue() : JOptionPane.CLOSED_OPTION;
 
         if (result == JOptionPane.OK_OPTION || buttonPressed.get()) {
             //validate and return both inputs

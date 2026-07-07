@@ -1,0 +1,138 @@
+# This workflow builds native binaries for Linux, Windows, and macOS
+# It runs on every push to main, pull request,
+# tag push (v*), or manual trigger.
+#
+# Each platform produces a single installer file:
+#   Linux   -> .AppImage and .deb
+#   Windows -> .exe installer
+#   macOS   -> .dmg image
+#
+# Creating a Release:
+#   git tag vX.X.X
+#   git push origin vX.X.X
+#
+#   This triggers the `release` job which collects all three artifacts
+#   and publishes them as a GitHub Release with auto-generated notes.
+#
+# Manual trigger:
+#   GitHub UI -> Actions -> Build Native Binaries -> Run workflow
+#
+
+name: Build Native Binaries
+
+on:
+  push:
+    branches: [ "main" ]
+    tags: [ "v*" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    env:
+      GRADLE_OPTS: -Dorg.gradle.daemon=false
+    strategy:
+      matrix:
+        include:
+          - name: Linux
+            os: ubuntu-latest
+            artifact: TileMakerDOT-Linux
+          - name: Windows
+            os: windows-latest
+            artifact: TileMakerDOT-Windows
+          - name: macOS
+            os: macos-latest
+            artifact: TileMakerDOT-macOS
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build with Gradle
+        run: ./gradlew build --no-daemon --stacktrace --info || { echo "::error::Gradle build failed" >&2; exit 1; }
+
+      - name: Build native package (app-image)
+        run: ./gradlew jpackageNative --no-daemon --stacktrace --info || { echo "::error::Gradle jpackageNative failed" >&2; exit 1; }
+
+      - name: Build .deb package (Linux only)
+        if: matrix.name == 'Linux'
+        run: ./gradlew jpackageDeb --no-daemon --stacktrace --info || { echo "::error::Gradle jpackageDeb failed" >&2; exit 1; }
+
+      - name: Convert to .AppImage
+        if: matrix.name == 'Linux'
+        run: |
+          set -euo pipefail
+          trap 'echo "ERROR: appimagetool failed with exit code $?" >&2' ERR
+          # Create .desktop file and copy icon for appimagetool
+          APP_DIR="build/jpackage/TileMakerDOT"
+          cp assets/icons/tile_editor_icon.png "$APP_DIR/TileMakerDOT.png"
+          printf '%s\n' '[Desktop Entry]' 'Name=TileMakerDOT' 'Exec=TileMakerDOT' 'Icon=TileMakerDOT' 'Type=Application' 'Categories=Graphics;2DGraphics;' > "$APP_DIR/TileMakerDOT.desktop"
+          chmod +x "$APP_DIR/TileMakerDOT.desktop"
+          # Download appimagetool
+          wget -q "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage" -O /tmp/appimagetool
+          chmod +x /tmp/appimagetool
+          # Extract and run without FUSE (more reliable in CI)
+          /tmp/appimagetool --appimage-extract-and-run \
+            build/jpackage/TileMakerDOT/ \
+            build/jpackage/TileMakerDOT-x86_64.AppImage
+
+      - name: Upload artifact (AppImage)
+        if: matrix.name != 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: build/jpackage/*
+
+      - name: Upload Linux AppImage artifact
+        if: matrix.name == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: TileMakerDOT-Linux-AppImage
+          path: build/jpackage/*.AppImage
+
+      - name: Upload Linux deb artifact
+        if: matrix.name == 'Linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: TileMakerDOT-Linux-Deb
+          path: build/jpackage/*.deb
+
+      - name: Final cleanup to prevent job cancellation
+        if: always()
+        run: |
+          ./gradlew --stop || true
+          exit 0
+
+  release:
+    name: Create Release
+    needs: [build]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            TileMakerDOT-Linux-AppImage/**
+            TileMakerDOT-Linux-Deb/**
+            TileMakerDOT-Windows/**
+            TileMakerDOT-macOS/**
+          generate_release_notes: true

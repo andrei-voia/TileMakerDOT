@@ -4,14 +4,31 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
 public final class ImageUtils {
 	
     public static final String PNG_FORMAT = ".png";
+    private static final String ICON_PATH = "assets/icons/tile_editor_icon.png";
     
 	private ImageUtils(){}
+
+	// Loads icon
+	public static Image loadIconImage() {
+		try {
+			File iconFile = new File(ICON_PATH);
+			if (iconFile.exists()) {
+				BufferedImage img = ImageIO.read(iconFile);
+				return img;
+			}
+	} catch (IOException e) {
+	}
+		return null;
+	}
 
     public static BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) {
         BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
