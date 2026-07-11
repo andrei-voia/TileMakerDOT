@@ -248,19 +248,24 @@ If you want to modify the code or contribute to TileMaker DOT, follow these step
 * **Java Development Kit (JDK):** Version 16 or higher.
 * **IDE:** Eclipse (my personal choice), IntelliJ IDEA, or VS Code.
 
-### IDE Setup (Manual Dependency Management)
-This project manages dependencies manually rather than using a build tool like Maven or Gradle. You must link the required UI library to your build path.
+### IDE Setup (Automated Gradle Workspace)
+This project uses Gradle to automatically handle compilation tasks and source dependencies like the FlatLaf UI library.
 
 **Eclipse Instructions:**
 1. Clone the repository to your local machine
-2. Open Eclipse and navigate to `File` > `Open Projects from File System` > `Directory`
-3. Select the cloned repository folder
-4. Add the FlatLaf UI library to your classpath:
-   * Right-click the project in the Package Explorer > `Build Path` > `Configure Build Path...`
-   * Go to the **Libraries** tab.
-   * Select **Classpath** > **Add JARs...** 
-   * Navigate to the project's `lib/` folder and select `flatlaf-3.5.4.jar`.
-5. Run the main class to launch the editor.
+2. Open Eclipse and navigate to `File` > `Import...`
+3. Expand the `Gradle` folder, select `Existing Gradle Project`, and click Next.
+4. Set the Project root directory to your cloned repository folder, then click Finish.
+5. Eclipse will automatically read build.gradle, resolve the FlatLaf dependencies, and configure your build environment cleanly
+6. Run the main class to launch the editor.
+
+## 🔨 Running Build Commands
+
+You can run compilation and distribution tasks directly from your terminal inside the root directory using the Gradle Wrapper:
+
+**Compile and build the standalone JAR:
+In Bash: `./gradlew clean jar`
+(The optimized executable JAR will be generated inside the `build/libs/` folder.)
 
 ***
 
