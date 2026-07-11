@@ -1,0 +1,213 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+// Load version from version.properties
+def versionProps = new Properties()
+file("version.properties").withInputStream { stream ->
+    versionProps.load(stream)
+}
+
+group = 'com.andrei-voia'
+version = versionProps.getProperty('version', '1.0.0')
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(16)
+    }
+}
+
+application {
+    mainClass = 'main.TileEditor'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.formdev:flatlaf:3.5.4'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+        resources {
+            srcDirs = ['src']
+            exclude '**/assets/**'
+        }
+    }
+}
+
+jar {
+    manifest {
+        attributes(
+            'Main-Class': 'main.TileEditor'
+        )
+    }
+    
+    // Pack compiled map editor class files into the JAR
+    from sourceSets.main.output
+    
+    // Unpack the automatically downloaded FlatLaf library and bundle it inside
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    
+    // Prevents errors if duplicate configuration files exist in dependencies
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+task runApp(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'main.TileEditor'
+    workingDir = projectDir
+}
+
+// Return the correct icon file for the current OS
+def getAppIconPath() {
+    def os = System.getProperty("os.name").toLowerCase(Locale.ROOT)
+    if (os.contains("linux")) {
+        return file("assets/icons/tile_editor_icon.png").absolutePath
+    } else if (os.contains("windows")) {
+        return file("assets/icons/tile_editor_icon.ico").absolutePath
+    } else if (os.contains("mac")) {
+        return file("assets/icons/tile_editor_icon.icns").absolutePath
+    }
+    return ""
+}
+
+// Build native application via jpackage (JDK 16+)
+// Builds only for the OS this command runs on
+
+tasks.register('jpackageNative', Exec) {
+    dependsOn jar
+
+    def jarFile = tasks.jar.archiveFile.get().asFile
+    def outputDir = file("${buildDir}/jpackage")
+    def appName = 'TileMakerDOT'
+    def iconPath = getAppIconPath()
+
+    doFirst {
+        outputDir.mkdirs()
+        // Ensure all runtime dependencies are available in the jpackage input directory
+        copy {
+            from configurations.runtimeClasspath
+            into jarFile.parentFile
+        }
+    }
+
+    commandLine 'jpackage',
+        '--input', jarFile.parentFile.absolutePath,
+        '--main-jar', jarFile.name,
+        '--main-class', 'main.TileEditor',
+        '--name', appName,
+        '--app-version', version,
+        '--vendor', 'Andrei-Voia',
+        '--description', 'Tile Map Editor',
+        '--dest', outputDir.absolutePath,
+        '--type', 'app-image',
+        '--icon', iconPath,
+        '--verbose'
+}
+
+// Build .deb package
+tasks.register('jpackageDeb', Exec) {
+    dependsOn jar
+
+    def jarFile = tasks.jar.archiveFile.get().asFile
+    def outputDir = file("${buildDir}/jpackage")
+    def appName = 'TileMakerDOT'
+    def iconPath = getAppIconPath()
+
+    doFirst {
+        outputDir.mkdirs()
+        // Ensure all runtime dependencies are available in the jpackage input directory
+        copy {
+            from configurations.runtimeClasspath
+            into jarFile.parentFile
+        }
+    }
+
+    commandLine 'jpackage',
+        '--input', jarFile.parentFile.absolutePath,
+        '--main-jar', jarFile.name,
+        '--main-class', 'main.TileEditor',
+        '--name', appName,
+        '--app-version', version,
+        '--vendor', 'Andrei-Voia',
+        '--description', 'Tile Map Editor',
+        '--dest', outputDir.absolutePath,
+        '--type', 'deb',
+        '--icon', iconPath,
+        '--verbose'
+}
+
+// Build Windows installer (.exe/.msi) - creates MSI wrapped in EXE
+tasks.register('jpackageWindowsInstaller', Exec) {
+    dependsOn jar
+
+    def jarFile = tasks.jar.archiveFile.get().asFile
+    def outputDir = file("${buildDir}/jpackage")
+    def appName = 'TileMakerDOT'
+    def iconPath = getAppIconPath()
+
+    doFirst {
+        outputDir.mkdirs()
+        // Ensure all runtime dependencies are available in the jpackage input directory
+        copy {
+            from configurations.runtimeClasspath
+            into jarFile.parentFile
+        }
+    }
+
+    // jpackage always bundles JRE, resulting in a folder install
+    commandLine 'jpackage',
+        '--input', jarFile.parentFile.absolutePath,
+        '--main-jar', jarFile.name,
+        '--main-class', 'main.TileEditor',
+        '--name', appName,
+        '--app-version', version,
+        '--vendor', 'Andrei-Voia',
+        '--description', 'Tile Map Editor',
+        '--dest', outputDir.absolutePath,
+        '--type', 'exe',
+        '--icon', iconPath,
+        '--win-dir-chooser',
+        '--verbose'
+}
+
+// Build .dmg package
+tasks.register('jpackageMacOS', Exec) {
+    dependsOn jar
+
+    def jarFile = tasks.jar.archiveFile.get().asFile
+    def outputDir = file("${buildDir}/jpackage")
+    def appName = 'TileMakerDOT'
+    def iconPath = getAppIconPath()
+
+    doFirst {
+        outputDir.mkdirs()
+        // Ensure all runtime dependencies are available in the jpackage input directory
+        copy {
+            from configurations.runtimeClasspath
+            into jarFile.parentFile
+        }
+    }
+
+    commandLine 'jpackage',
+        '--input', jarFile.parentFile.absolutePath,
+        '--main-jar', jarFile.name,
+        '--main-class', 'main.TileEditor',
+        '--name', appName,
+        '--app-version', version,
+        '--vendor', 'Andrei-Voia',
+        '--description', 'Tile Map Editor',
+        '--dest', outputDir.absolutePath,
+        '--type', 'dmg',
+        '--icon', iconPath,
+        '--verbose'
+}
