@@ -186,6 +186,12 @@ public class ResourceLoaderWorker extends SwingWorker<Void, Void> {
                             
                             System.out.println("DEBUG: Trying to load asset from path: " + path);
                             
+                            //VISUAL POP-UP
+                            javax.swing.JOptionPane.showMessageDialog(null, 
+                                "DEBUG PATH:\n" + path + "\n\nAbsolute:\n" + new java.io.File(path).getAbsolutePath() + "\n\nExists: " + new java.io.File(path).exists(), 
+                                "Asset Diagnostic", 
+                                javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                            
                             autotiles.add(new Autotile(extractedIds.get(0), extractedIds.get(1), 
                             		extractedIds.get(2), file.getName(), image, path));
                         }
@@ -224,6 +230,13 @@ public class ResourceLoaderWorker extends SwingWorker<Void, Void> {
                     path = path.replace("\\", "/");
                     
                     System.out.println("DEBUG: Trying to load asset from path: " + path);
+                    
+                    
+                    //VISUAL POP-UP
+                    javax.swing.JOptionPane.showMessageDialog(null, 
+                        "DEBUG PATH:\n" + path + "\n\nAbsolute:\n" + new java.io.File(path).getAbsolutePath() + "\n\nExists: " + new java.io.File(path).exists(), 
+                        "Asset Diagnostic", 
+                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
                     
                     if (frames.size() > 1) {
                         //create the new animated tile class
