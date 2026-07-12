@@ -18,6 +18,11 @@ java {
     }
 }
 
+// Force UTF-8 encoding so the emojis insite tool compile cleanly
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
 application {
     mainClass = 'main.TileEditor'
 }
@@ -80,9 +85,8 @@ def getAppIconPath() {
     return ""
 }
 
-// Build native application via jpackage (JDK 16+)
-// Builds only for the OS this command runs on
-
+// Build native portable application folder via jpackage (JDK 16+)
+// Injects the assets folder right next to the executable launcher on all platforms
 tasks.register('jpackageNative', Exec) {
     dependsOn jar
 
@@ -112,102 +116,24 @@ tasks.register('jpackageNative', Exec) {
         '--type', 'app-image',
         '--icon', iconPath,
         '--verbose'
-}
-
-// Build .deb package
-tasks.register('jpackageDeb', Exec) {
-    dependsOn jar
-
-    def jarFile = tasks.jar.archiveFile.get().asFile
-    def outputDir = file("${buildDir}/jpackage")
-    def appName = 'TileMakerDOT'
-    def iconPath = getAppIconPath()
-
-    doFirst {
-        outputDir.mkdirs()
-        // Ensure all runtime dependencies are available in the jpackage input directory
-        copy {
-            from configurations.runtimeClasspath
-            into jarFile.parentFile
+        
+    doLast {
+        def os = System.getProperty("os.name").toLowerCase(Locale.ROOT)
+        
+        if (os.contains("mac")) {
+            // macOS structure: Executable launcher is deep inside Contents/MacOS/
+            copy {
+                from "assets"
+                into "${outputDir.absolutePath}/${appName}.app/Contents/MacOS/assets"
+            }
+            println "Portable macOS app bundle generated at: ${outputDir.absolutePath}/${appName}.app"
+        } else {
+            // Windows and Linux structure: assets sit flat next to the main binary launcher
+            copy {
+                from "assets"
+                into "${outputDir.absolutePath}/${appName}/assets"
+            }
+            println "Portable release folder generated at: ${outputDir.absolutePath}/${appName}"
         }
     }
-
-    commandLine 'jpackage',
-        '--input', jarFile.parentFile.absolutePath,
-        '--main-jar', jarFile.name,
-        '--main-class', 'main.TileEditor',
-        '--name', appName,
-        '--app-version', version,
-        '--vendor', 'Andrei-Voia',
-        '--description', 'Tile Map Editor',
-        '--dest', outputDir.absolutePath,
-        '--type', 'deb',
-        '--icon', iconPath,
-        '--verbose'
-}
-
-// Build Windows installer (.exe/.msi) - creates MSI wrapped in EXE
-tasks.register('jpackageWindowsInstaller', Exec) {
-    dependsOn jar
-
-    def jarFile = tasks.jar.archiveFile.get().asFile
-    def outputDir = file("${buildDir}/jpackage")
-    def appName = 'TileMakerDOT'
-    def iconPath = getAppIconPath()
-
-    doFirst {
-        outputDir.mkdirs()
-        // Ensure all runtime dependencies are available in the jpackage input directory
-        copy {
-            from configurations.runtimeClasspath
-            into jarFile.parentFile
-        }
-    }
-
-    // jpackage always bundles JRE, resulting in a folder install
-    commandLine 'jpackage',
-        '--input', jarFile.parentFile.absolutePath,
-        '--main-jar', jarFile.name,
-        '--main-class', 'main.TileEditor',
-        '--name', appName,
-        '--app-version', version,
-        '--vendor', 'Andrei-Voia',
-        '--description', 'Tile Map Editor',
-        '--dest', outputDir.absolutePath,
-        '--type', 'exe',
-        '--icon', iconPath,
-        '--win-dir-chooser',
-        '--verbose'
-}
-
-// Build .dmg package
-tasks.register('jpackageMacOS', Exec) {
-    dependsOn jar
-
-    def jarFile = tasks.jar.archiveFile.get().asFile
-    def outputDir = file("${buildDir}/jpackage")
-    def appName = 'TileMakerDOT'
-    def iconPath = getAppIconPath()
-
-    doFirst {
-        outputDir.mkdirs()
-        // Ensure all runtime dependencies are available in the jpackage input directory
-        copy {
-            from configurations.runtimeClasspath
-            into jarFile.parentFile
-        }
-    }
-
-    commandLine 'jpackage',
-        '--input', jarFile.parentFile.absolutePath,
-        '--main-jar', jarFile.name,
-        '--main-class', 'main.TileEditor',
-        '--name', appName,
-        '--app-version', version,
-        '--vendor', 'Andrei-Voia',
-        '--description', 'Tile Map Editor',
-        '--dest', outputDir.absolutePath,
-        '--type', 'dmg',
-        '--icon', iconPath,
-        '--verbose'
 }

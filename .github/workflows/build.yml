@@ -73,76 +73,38 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      # Compile the core application code
       - name: Build with Gradle
         run: ./gradlew build --no-daemon --stacktrace --info || { echo "::error::Gradle build failed" >&2; exit 1; }
 
-      - name: Build native package (app-image)
+      # Generate the portable app-image layout + inject assets on ALL systems
+      - name: Build cross-platform native portable package
         run: ./gradlew jpackageNative --no-daemon --stacktrace --info || { echo "::error::Gradle jpackageNative failed" >&2; exit 1; }
 
-      - name: Build Windows installer
+      # Compress Windows build (Runs only on Windows runner)
+      - name: Archive Windows Portable Folder
         if: matrix.name == 'Windows'
-        run: ./gradlew jpackageWindowsInstaller --no-daemon --stacktrace --info || { echo "::error::Gradle jpackageWindowsInstaller failed" >&2; exit 1; }
-
-      - name: Build .deb package (Linux only)
+        shell: powershell
+        run: Compress-Archive -Path "build/jpackage/TileMakerDOT" -DestinationPath "build/jpackage/TileMakerDOT-Windows-x64.zip"
+        
+      # Compress Linux build (Runs only on Linux runner)
+      - name: Archive Linux Portable Folder
         if: matrix.name == 'Linux'
-        run: ./gradlew jpackageDeb --no-daemon --stacktrace --info || { echo "::error::Gradle jpackageDeb failed" >&2; exit 1; }
+        run: tar -czf build/jpackage/TileMakerDOT-Linux-x64.tar.gz -C build/jpackage TileMakerDOT
 
-      - name: Convert to .AppImage
-        if: matrix.name == 'Linux'
-        run: |
-          set -euo pipefail
-          trap 'echo "ERROR: appimagetool failed with exit code $?" >&2' ERR
-          # Create .desktop file and copy icon for appimagetool
-          APP_DIR="build/jpackage/TileMakerDOT"
-          cp assets/icons/tile_editor_icon.png "$APP_DIR/TileMakerDOT.png"
-          printf '%s\n' '[Desktop Entry]' 'Name=TileMakerDOT' 'Exec=TileMakerDOT' 'Icon=TileMakerDOT' 'Type=Application' 'Categories=Graphics;2DGraphics;' > "$APP_DIR/TileMakerDOT.desktop"
-          chmod +x "$APP_DIR/TileMakerDOT.desktop"
-          # Download appimagetool
-          wget -q "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage" -O /tmp/appimagetool
-          chmod +x /tmp/appimagetool
-          # Extract and run without FUSE (more reliable in CI)
-          /tmp/appimagetool --appimage-extract-and-run \
-            build/jpackage/TileMakerDOT/ \
-            build/jpackage/TileMakerDOT-x86_64.AppImage
-
-      - name: Upload Windows portable artifact
-        if: matrix.name == 'Windows'
-        uses: actions/upload-artifact@v4
-        with:
-          name: TileMakerDOT-Windows-Portable
-          path: build/jpackage/TileMakerDOT/**
-
-      - name: Upload Windows installer artifact
-        if: matrix.name == 'Windows'
-        uses: actions/upload-artifact@v4
-        with:
-          name: TileMakerDOT-Windows-Installer
-          path: build/jpackage/*.exe
-
-      - name: Build macOS dmg
+      # Compress macOS build (Runs only on macOS runner)
+      - name: Archive macOS Portable Bundle
         if: matrix.name == 'macOS'
-        run: ./gradlew jpackageMacOS --no-daemon --stacktrace --info || { echo "::error::Gradle jpackageMacOS failed" >&2; exit 1; }
+        run: zip -r build/jpackage/TileMakerDOT-macOS-x64.zip build/jpackage/TileMakerDOT.app
 
-      - name: Upload macOS artifact
-        if: matrix.name == 'macOS'
+      # Upload the packed archive to the workflow workspace
+      - name: Upload Native Portable Archive
         uses: actions/upload-artifact@v4
         with:
-          name: TileMakerDOT-macOS
-          path: build/jpackage/*.dmg
-
-      - name: Upload Linux AppImage artifact
-        if: matrix.name == 'Linux'
-        uses: actions/upload-artifact@v4
-        with:
-          name: TileMakerDOT-Linux-AppImage
-          path: build/jpackage/*.AppImage
-
-      - name: Upload Linux deb artifact
-        if: matrix.name == 'Linux'
-        uses: actions/upload-artifact@v4
-        with:
-          name: TileMakerDOT-Linux-Deb
-          path: build/jpackage/*.deb
+          name: TileMakerDOT-${{ matrix.name }}-Archive
+          path: |
+            build/jpackage/*.zip
+            build/jpackage/*.tar.gz
 
       - name: Final cleanup to prevent job cancellation
         if: always()
@@ -160,14 +122,13 @@ jobs:
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true # Flattens your single file distributions into one directory
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            TileMakerDOT-Linux-AppImage/**
-            TileMakerDOT-Linux-Deb/**
-            TileMakerDOT-Windows-Portable/**
-            TileMakerDOT-Windows-Installer/**
-            TileMakerDOT-macOS/**
+            *.zip
+            *.tar.gz
           generate_release_notes: true
