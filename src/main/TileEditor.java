@@ -56,17 +56,40 @@ public class TileEditor {
     }
     
     private void createAndShowGUI() {
+    	
+    	
+        //VISUAL POP-UP
+        javax.swing.JOptionPane.showMessageDialog(null, 
+            "STARTING app", 
+            "Asset Diagnostic", 
+            javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        
     	//load initial setup and input dialog
     	loadedSetup = new LoadedSetup(this);
 
         //create the starting window where you can edit your input before using this tool
         editorWindow = new EditorWindow(this);
         
+        //VISUAL POP-UP
+        javax.swing.JOptionPane.showMessageDialog(null, 
+            "AFTER editor", 
+            "Asset Diagnostic", 
+            javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        
+        
         //get grid size and tile size
         String[] inputs = editorWindow.showGridSizeSelectionDialog(loadedSetup.getDefaultSizes(), loadedSetup.getTileSizeLoaded(), Long.toString(loadedSetup.getFrameDuration()));
         if (inputs == null || inputs.length != 4 || !inputs[0].matches("\\d+x\\d+") || !inputs[1].matches("\\d+")) {
             return;
         }
+        
+        
+        //VISUAL POP-UP
+        javax.swing.JOptionPane.showMessageDialog(null, 
+            "AFTER 2 inputs", 
+            "Asset Diagnostic", 
+            javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        
         
         if(inputs[2].equals("true")) {
         	File idLoaderPath = new File(loadedSetup.getOldResourceBasePath() + "/settings/" + "default_used_ids_list.txt");
@@ -80,6 +103,14 @@ public class TileEditor {
         	}
         }
         
+        
+        //VISUAL POP-UP
+        javax.swing.JOptionPane.showMessageDialog(null, 
+            "before animation frame", 
+            "Asset Diagnostic", 
+            javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        
+        
         long newFrameDuration = Long.parseLong(inputs[3]);
         if(newFrameDuration != loadedSetup.getFrameDuration()) {
         	loadedSetup.setFrameDuration(newFrameDuration);
@@ -90,6 +121,14 @@ public class TileEditor {
         //create the main frame
         JFrame frame = new JFrame("TileMaker DOT");
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        
+        
+        //VISUAL POP-UP
+        javax.swing.JOptionPane.showMessageDialog(null, 
+            "BEFORE loading", 
+            "Asset Diagnostic", 
+            javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        
 
         //create and show the loading screen
         JDialog loadingDialog = Utils.createLoadingDialog(frame);
@@ -99,7 +138,15 @@ public class TileEditor {
         //use a timer to show the dialog slightly later if needed for now keep it 0
         Timer showDialogTimer = new Timer(0, e -> loadingDialog.setVisible(true));
         showDialogTimer.setRepeats(false);
-        showDialogTimer.start();
+//        showDialogTimer.start();
+        
+        
+        //VISUAL POP-UP
+        javax.swing.JOptionPane.showMessageDialog(null, 
+            "AFTER timer and loading toooooo ", 
+            "Asset Diagnostic", 
+            javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        
         
         //initialize the application legend text
         applicationLegend = new ApplicationLegend();

@@ -53,7 +53,15 @@ public class ResourceLoaderWorker extends SwingWorker<Void, Void> {
 
     //this method runs on a separate background thread
     @Override
-    protected Void doInBackground() throws Exception {
+	protected Void doInBackground() throws Exception {
+    	
+        
+        //VISUAL POP-UP
+        javax.swing.JOptionPane.showMessageDialog(null, 
+            "STARTING DO IN BACKHGROUND ResourceLoaderWorker", 
+            "Asset Diagnostic", 
+            javax.swing.JOptionPane.INFORMATION_MESSAGE);
+    	
         //load resources
         tileCategories = loadTilesByCategory(Utils.TILES_NAME);
         objectCategories = loadTilesByCategory(Utils.OBJECTS_NAME);
@@ -91,6 +99,7 @@ public class ResourceLoaderWorker extends SwingWorker<Void, Void> {
         if (!texturesWithoutIds.isEmpty()) {
             StringBuilder report = new StringBuilder("The following " + texturesWithoutIds.size() + 
             		" textures were skipped because they lack an ID:\n\n");
+            
             
             final int howManyShow = 20;
             int count = 0;
@@ -230,13 +239,6 @@ public class ResourceLoaderWorker extends SwingWorker<Void, Void> {
                     path = path.replace("\\", "/");
                     
                     System.out.println("DEBUG: Trying to load asset from path: " + path);
-                    
-                    
-                    //VISUAL POP-UP
-                    javax.swing.JOptionPane.showMessageDialog(null, 
-                        "DEBUG PATH:\n" + path + "\n\nAbsolute:\n" + new java.io.File(path).getAbsolutePath() + "\n\nExists: " + new java.io.File(path).exists(), 
-                        "Asset Diagnostic", 
-                        javax.swing.JOptionPane.INFORMATION_MESSAGE);
                     
                     if (frames.size() > 1) {
                         //create the new animated tile class
