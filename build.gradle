@@ -129,9 +129,26 @@ tasks.register('jpackageNative', Exec) {
             println "Portable macOS app bundle generated at: ${outputDir.absolutePath}/${appName}.app"
         } else if (os.contains("linux")) {
             // Linux structure: Executable launcher sits inside the bin/ directory
-            copy {
+			copy {
                 from "assets"
                 into "${outputDir.absolutePath}/${appName}/bin/assets"
+            }
+			
+            // This builds a runnable .desktop shortcut right in the root of the portable Linux output folder
+            def desktopFile = file("${outputDir.absolutePath}/${appName}/Launch_TileMaker.desktop")
+            desktopFile.text = """[Desktop Entry]
+			Type=Application
+			Name=TileMakerDOT
+			Comment=Tile Map Editor
+			Exec=\$(dirname \$(readlink -f %k))/bin/TileMakerDOT
+			Icon=\$(dirname \$(readlink -f %k))/bin/assets/icons/tile_editor_icon.png
+			Terminal=false
+			Categories=Development;
+			StartupWMClass=main-TileEditor
+			"""
+            // Make the generated shortcut executable on the Linux file system
+            exec {
+                commandLine 'chmod', '+x', desktopFile.absolutePath
             }
             println "Portable Linux release folder generated at: ${outputDir.absolutePath}/${appName}"
         } else {
