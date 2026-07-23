@@ -23,6 +23,7 @@ import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 
 import core.Tile;
+import localization.LocalizationManager;
 import tools.SearchFieldFunction;
 import utils.ApplicationLegend;
 import utils.IDLoader;
@@ -274,9 +275,10 @@ public class TileEditor {
         
         //show message if any hidden folders were found
         if(!assetPalette.getHiddenFolders().isEmpty()) {
+        	LocalizationManager loc = LocalizationManager.getInstance();
             JOptionPane.showMessageDialog(
-                    frame, "The following folders will be hidden: " + assetPalette.getHiddenFolders().toString(),
-                    "Hidden folders detected", JOptionPane.INFORMATION_MESSAGE);
+                    frame, loc.getFormattedString("hidden_folders_message", assetPalette.getHiddenFolders().toString()),
+                    loc.getString("hidden_folders_message"), JOptionPane.INFORMATION_MESSAGE);
         }
 
         //forced revalidation after GUI is visible
@@ -296,16 +298,20 @@ public class TileEditor {
     
     //displays a confirmation dialog and exits the application if the user confirms
     private void confirmExit(JFrame frame) {
-        int response = JOptionPane.showConfirmDialog(
+    	LocalizationManager loc = LocalizationManager.getInstance();
+        int response = JOptionPane.showOptionDialog(
             frame,
-            "Are you sure you want to exit? Any unsaved work will be lost.",
-            "Confirm Exit",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.WARNING_MESSAGE
+            loc.getString("exit_confirm_message"),
+            loc.getString("exit_confirm_title"),
+            JOptionPane.DEFAULT_OPTION,
+            JOptionPane.WARNING_MESSAGE,
+            null,
+            new Object[]{loc.getString("button_yes"), loc.getString("button_no")},
+            loc.getString("button_yes")
         );
 
         //if the user clicks yes then terminate the application
-        if (response == JOptionPane.YES_OPTION) {
+        if (response == 0) {
             frame.dispose(); //clean up the window resources
             System.exit(0);  //terminate the Java Virtual Machine
         }

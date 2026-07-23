@@ -19,6 +19,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
+import localization.LocalizationManager;
 import utils.OSDetector;
 
 public class EditorWindow {
@@ -32,12 +33,14 @@ public class EditorWindow {
 	//shows a custom dialog window to select grid size and input tile size at the beginning of the application
     public String[] showGridSizeSelectionDialog(List<String> defaultSizes, 
     		String tileSizeLoaded, String frameDuration) {
+    	LocalizationManager loc = LocalizationManager.getInstance();
+    	
         JTextField gridSizeField = new JTextField(defaultSizes.get(0), 10);
         JTextField tileSizeField = new JTextField(tileSizeLoaded + "", 5);
         JTextField animationDurationField = new JTextField(frameDuration + "", 5);
         
         //create the check box
-        JCheckBox readIdUniqueCheckBox = new JCheckBox("Load only the IDs from the specified list in Assets folder");
+        JCheckBox readIdUniqueCheckBox = new JCheckBox(loc.getString("startup_load_ids"));
         readIdUniqueCheckBox.setSelected(false);
         
         JTextField pathField = new JTextField(tileEditor.getLoadedSetup().getResourceBasePath(), 20);
@@ -63,17 +66,17 @@ public class EditorWindow {
 
         //panel for manual grid size input
         JPanel gridSizePanel = new JPanel(new BorderLayout(5, 5));
-        gridSizePanel.add(new JLabel("Enter Grid Size (e.g. 100x100):"), BorderLayout.NORTH);
+        gridSizePanel.add(new JLabel(loc.getString("startup_grid_label")), BorderLayout.NORTH);
         gridSizePanel.add(gridSizeField, BorderLayout.CENTER);
         
         //panel for tile size input
         JPanel tileSizePanel = new JPanel(new BorderLayout(5, 5));
-        tileSizePanel.add(new JLabel("Enter Tile Size (e.g. 32, 64):"), BorderLayout.NORTH);
+        tileSizePanel.add(new JLabel(loc.getString("startup_tile_label")), BorderLayout.NORTH);
         tileSizePanel.add(tileSizeField, BorderLayout.CENTER);
         
         //panel for the duration of the animation input
         JPanel animationDurationPanel = new JPanel(new BorderLayout(5, 5));
-        animationDurationPanel.add(new JLabel("Enter Animation Frame Duration (ms):"), BorderLayout.NORTH);
+        animationDurationPanel.add(new JLabel(loc.getString("startup_anim_label")), BorderLayout.NORTH);
         animationDurationPanel.add(animationDurationField, BorderLayout.CENTER);
 
         //panel for assets path input
@@ -83,10 +86,10 @@ public class EditorWindow {
             case "macOS" -> "/Users/name/MyAssets";
             default -> "/home/name/MyAssets";
         };
-        pathPanel.add(new JLabel("Enter Asset Base Path (e.g. assets or " + osExample + "):"), BorderLayout.NORTH);
+        pathPanel.add(new JLabel(loc.getFormattedString("startup_path_label", osExample)), BorderLayout.NORTH);
         
         //add a button to open a JFileChooser for the directory
-        JButton browseButton = new JButton("Browse...");
+        JButton browseButton = new JButton(loc.getString("startup_browse"));
         browseButton.addActionListener(e -> {
             JFileChooser chooser = new JFileChooser();
             chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -112,7 +115,7 @@ public class EditorWindow {
         //panel for default size buttons
         JPanel optionsPanel = new JPanel(new BorderLayout());
         optionsPanel.add(new JSeparator(), BorderLayout.NORTH);
-        optionsPanel.add(new JLabel("Or select a Default Grid Size:"), BorderLayout.CENTER);
+        optionsPanel.add(new JLabel(loc.getString("startup_default_grid")), BorderLayout.CENTER);
         optionsPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         //main dialog content panel
@@ -126,7 +129,7 @@ public class EditorWindow {
             JOptionPane.PLAIN_MESSAGE,
             JOptionPane.OK_CANCEL_OPTION
         );
-        JDialog dialog = optionPane.createDialog(null, "Map Dimensions and Settings");
+        JDialog dialog = optionPane.createDialog(null, loc.getString("startup_title"));
         dialog.setVisible(true);
 
         int result = (optionPane.getValue() instanceof Integer) ? (int) optionPane.getValue() : JOptionPane.CLOSED_OPTION;
@@ -147,13 +150,13 @@ public class EditorWindow {
             
             //basic validation for tile size
             if (!tileSize.matches("\\d+") || Integer.parseInt(tileSize) <= 0) {
-                 JOptionPane.showMessageDialog(null, "Invalid Tile Size. Must be a positive integer.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                 JOptionPane.showMessageDialog(null, loc.getString("startup_invalid_tile"), loc.getString("startup_error_title"), JOptionPane.ERROR_MESSAGE);
                  return null;
             }
             
             //basic validation for animation speed
             if (!animationDuration.matches("\\d+") || Integer.parseInt(animationDuration) <= 0) {
-                 JOptionPane.showMessageDialog(null, "Invalid Tile Size. Must be a positive number.", "Input Error", JOptionPane.ERROR_MESSAGE);
+                 JOptionPane.showMessageDialog(null, loc.getString("startup_invalid_anim"), loc.getString("startup_error_title"), JOptionPane.ERROR_MESSAGE);
                  return null;
             }
             

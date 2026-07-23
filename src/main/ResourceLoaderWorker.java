@@ -19,6 +19,7 @@ import javax.swing.SwingWorker;
 import core.Autotile;
 import core.Tile;
 import core.TileAnimated;
+import localization.LocalizationManager;
 import utils.ImageUtils;
 import utils.NaturalFileComparator;
 import utils.Utils;
@@ -81,16 +82,17 @@ public class ResourceLoaderWorker extends SwingWorker<Void, Void> {
             showLoadingAutotilesReport(frame);
 
         } catch (Exception e) {
+        	LocalizationManager loc = LocalizationManager.getInstance();
             e.printStackTrace();
-            JOptionPane.showMessageDialog(frame, "Error loading resources: " + e.getMessage(), "Fatal Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, loc.getFormattedString("resource_fatal_error", e.getMessage()), loc.getString("resource_fatal_title"), JOptionPane.ERROR_MESSAGE);
             System.exit(1);
         }
     }
     
     private void showLoadingAssetsReport(JFrame frame) {
+    	LocalizationManager loc = LocalizationManager.getInstance();
         if (!texturesWithoutIds.isEmpty()) {
-            StringBuilder report = new StringBuilder("The following " + texturesWithoutIds.size() + 
-            		" textures were skipped because they lack an ID:\n\n");
+            StringBuilder report = new StringBuilder(loc.getFormattedString("resource_skipped_textures", texturesWithoutIds.size()));
             
             final int howManyShow = 20;
             int count = 0;
@@ -100,12 +102,12 @@ public class ResourceLoaderWorker extends SwingWorker<Void, Void> {
                 
                 //limit the pop up size so it does not go off screen
                 if (count >= howManyShow) {
-                    report.append("... and ").append(texturesWithoutIds.size() - howManyShow).append(" more.");
+                    report.append(loc.getFormattedString("resource_and_more", texturesWithoutIds.size() - howManyShow));
                     break;
                 }
             }
 
-            JOptionPane.showMessageDialog(frame, report.toString(), "Texture Loading Warning", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(frame, report.toString(), loc.getString("resource_texture_warning"), JOptionPane.WARNING_MESSAGE);
             
             //clear the list so it does not double up on the next F5 refresh
             texturesWithoutIds.clear();
@@ -113,9 +115,9 @@ public class ResourceLoaderWorker extends SwingWorker<Void, Void> {
     }
     
     private void showLoadingAutotilesReport(JFrame frame) {
+    	LocalizationManager loc = LocalizationManager.getInstance();
         if (!badAutotiles.isEmpty()) {
-            StringBuilder report = new StringBuilder("The following " + badAutotiles.size() + 
-            		" autotiles were skipped because they are not correctly named:\n\n");
+            StringBuilder report = new StringBuilder(loc.getFormattedString("resource_skipped_autotiles", badAutotiles.size()));
             
             final int howManyShow = 20;
             int count = 0;
@@ -125,12 +127,12 @@ public class ResourceLoaderWorker extends SwingWorker<Void, Void> {
                 
                 //limit the pop up size so it does not go off screen
                 if (count >= howManyShow) {
-                    report.append("... and ").append(badAutotiles.size() - howManyShow).append(" more.");
+                    report.append(loc.getFormattedString("resource_and_more", badAutotiles.size() - howManyShow));
                     break;
                 }
             }
 
-            JOptionPane.showMessageDialog(frame, report.toString(), "Autotile Loading Warning", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(frame, report.toString(), loc.getString("resource_autotile_warning"), JOptionPane.WARNING_MESSAGE);
             
             //clear the list so it does not double up on the next F5 refresh
             badAutotiles.clear();

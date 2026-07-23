@@ -31,6 +31,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import data.MapDirection;
+import localization.LocalizationManager;
 import tools.SpritesheetImporter;
 import utils.ApplicationLegend;
 import utils.ImageUtils;
@@ -67,9 +68,11 @@ public class EditorMenuBar {
     
     //creates and returns the application JMenuBar and organizing existing functions
 	public JMenuBar createMenuBar(JFrame frame) {
-        JMenu fileMenu = new JMenu("File");
+		LocalizationManager loc = LocalizationManager.getInstance();
+		
+        JMenu fileMenu = new JMenu(loc.getString("file_menu"));
         
-        JMenuItem loadItem = new JMenuItem("Load Map...");
+        JMenuItem loadItem = new JMenuItem(loc.getString("menu_load_map"));
         loadItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
         loadItem.addActionListener(e -> {
             JFileChooser chooser = new JFileChooser();
@@ -92,7 +95,7 @@ public class EditorMenuBar {
             }
         });
         
-        JMenuItem saveItem = new JMenuItem("Save As...");
+        JMenuItem saveItem = new JMenuItem(loc.getString("menu_save_as"));
         saveItem.setAccelerator(KeyStroke.getKeyStroke(
         	    KeyEvent.VK_S,
         	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx() | InputEvent.SHIFT_DOWN_MASK
@@ -110,17 +113,17 @@ public class EditorMenuBar {
             }
         });
         
-        quickSaveItem = new JMenuItem("Quick Save...");
+        quickSaveItem = new JMenuItem(loc.getString("menu_quick_save"));
         quickSaveItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
         quickSaveItem.addActionListener(e -> {
         	canvas.getMapExporter().saveMap(canvas.getMapState().getCacheData().getCachedSavedLocation(), false);
         	canvas.getMapState().getCacheData().setCanQuickSave(false);
         	tileEditor.getStatusInfoBar().updateStatusUI();
-        	canvas.getToastNotification().showToastNotification("Map saved..");
+        	canvas.getToastNotification().showToastNotification(loc.getString("toast_map_saved"));
         });
         
-        JMenuItem saveChunkSelection = new JMenuItem("Export Chunk Selection...");
-        saveChunkSelection.setToolTipText("Export only the currently selected area of the map");
+        JMenuItem saveChunkSelection = new JMenuItem(loc.getString("menu_export_chunk"));
+        saveChunkSelection.setToolTipText(loc.getString("menu_export_chunk_tooltip"));
         saveChunkSelection.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
         saveChunkSelection.addActionListener(e -> {
             JFileChooser chooser = new JFileChooser();
@@ -129,8 +132,8 @@ public class EditorMenuBar {
             }
         });
         
-        JMenuItem importChunkSelection = new JMenuItem("Import Chunk Selection...");
-        importChunkSelection.setToolTipText("Import a previously exported map chunk into the current map");
+        JMenuItem importChunkSelection = new JMenuItem(loc.getString("menu_import_chunk"));
+        importChunkSelection.setToolTipText(loc.getString("menu_import_chunk_tooltip"));
         importChunkSelection.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
         importChunkSelection.addActionListener(e -> {
             JFileChooser chooser = new JFileChooser();
@@ -147,7 +150,7 @@ public class EditorMenuBar {
             }
         });
         
-        JMenuItem exportLvlFormat = new JMenuItem("Export *.lvl...");
+        JMenuItem exportLvlFormat = new JMenuItem(loc.getString("menu_export_lvl"));
         exportLvlFormat.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
         exportLvlFormat.addActionListener(e -> {
             JFileChooser chooser = new JFileChooser();
@@ -156,8 +159,8 @@ public class EditorMenuBar {
             }
         });
         
-        JMenuItem exportCsvFormat = new JMenuItem("Export *.csv...");
-        exportCsvFormat.setToolTipText("Saves your map as a plain text grid of IDs, being perfect for retro engines, spreadsheet analysis, or the simplest possible custom data parsing");
+        JMenuItem exportCsvFormat = new JMenuItem(loc.getString("menu_export_csv"));
+        exportCsvFormat.setToolTipText(loc.getString("menu_export_csv_tooltip"));
         exportCsvFormat.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
         exportCsvFormat.addActionListener(e -> {
             JFileChooser chooser = new JFileChooser();
@@ -166,8 +169,8 @@ public class EditorMenuBar {
             }
         });
         
-        JMenuItem exportTmxFormat = new JMenuItem("Export to Tiled (.tmx/.tsx)...");
-        exportTmxFormat.setToolTipText("Generates a Tiled Map (.tmx) and Tileset (.tsx), use to import your map into Godot Unity or Tiled with full layer and object support");
+        JMenuItem exportTmxFormat = new JMenuItem(loc.getString("menu_export_tmx"));
+        exportTmxFormat.setToolTipText(loc.getString("menu_export_tmx_tooltip"));
         exportTmxFormat.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
         exportTmxFormat.addActionListener(e -> {
             JFileChooser chooser = new JFileChooser();
@@ -176,8 +179,8 @@ public class EditorMenuBar {
             }
         });
         
-        JMenuItem exportJsonFormat = new JMenuItem("Export *.json *.tmj...");
-        exportJsonFormat.setToolTipText("Generates a lightweight data structure ideal for GameMaker (GML) or custom web engines, providing a clean array of texture IDs for total logic control");
+        JMenuItem exportJsonFormat = new JMenuItem(loc.getString("menu_export_json"));
+        exportJsonFormat.setToolTipText(loc.getString("menu_export_json_tooltip"));
         exportJsonFormat.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_J, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
         exportJsonFormat.addActionListener(e -> {
             JFileChooser chooser = new JFileChooser();
@@ -186,8 +189,8 @@ public class EditorMenuBar {
             }
         });
         
-        JMenuItem exportItem = new JMenuItem("Export Image (PNG)...");
-        exportItem.setToolTipText("Save the entire map as a single PNG image");
+        JMenuItem exportItem = new JMenuItem(loc.getString("menu_export_png"));
+        exportItem.setToolTipText(loc.getString("menu_export_png_tooltip"));
         exportItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
         exportItem.addActionListener(e -> {
             JFileChooser chooser = new JFileChooser();
@@ -196,8 +199,8 @@ public class EditorMenuBar {
             }
         });
         
-        JMenuItem exportIds = new JMenuItem("Export Used IDs List...");
-        exportIds.setToolTipText("Export a text file listing all unique Tile IDs used in this map");
+        JMenuItem exportIds = new JMenuItem(loc.getString("menu_export_ids"));
+        exportIds.setToolTipText(loc.getString("menu_export_ids_tooltip"));
         exportIds.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
         exportIds.addActionListener(e -> {
             JFileChooser chooser = new JFileChooser();
@@ -206,12 +209,12 @@ public class EditorMenuBar {
             }
         });
         
-        JMenuItem spriteSheetImport = new JMenuItem("Import Spritesheet...");
-        spriteSheetImport.setToolTipText("Slice a spritesheet into individual objects/NPCs/tiles");
+        JMenuItem spriteSheetImport = new JMenuItem(loc.getString("menu_import_spritesheet"));
+        spriteSheetImport.setToolTipText(loc.getString("menu_import_spritesheet_tooltip"));
         spriteSheetImport.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
         spriteSheetImport.addActionListener(e -> {
         	JFileChooser fc = new JFileChooser();
-        	fc.setDialogTitle("Select Spritesheet Image");
+        	fc.setDialogTitle(loc.getString("dialog_select_spritesheet"));
 
         	//create the filter
         	FileNameExtensionFilter filter = new FileNameExtensionFilter("PNG Images", "png");
@@ -231,11 +234,11 @@ public class EditorMenuBar {
         	            //refresh your assets after importing message
                         if(showSpreadsheetUpdateOnce) {
                         	showSpreadsheetUpdateOnce = false;
-                        	JOptionPane.showMessageDialog(frame, "Please restart or refresh assets to see new items after all Sprite Sheets are imported.");
+                        	JOptionPane.showMessageDialog(frame, loc.getString("dialog_restart_refresh"));
                         }
         	        }
         	    } else {
-        	        JOptionPane.showMessageDialog(frame, "Please select a valid .png file.");
+        	        JOptionPane.showMessageDialog(frame, loc.getString("dialog_select_png"));
         	    }
         	}
         });
@@ -257,85 +260,85 @@ public class EditorMenuBar {
         fileMenu.add(exportItem);
         
         //edit menu
-        JMenu editMenu = new JMenu("Edit");
+        JMenu editMenu = new JMenu(loc.getString("edit_menu"));
         
-        JMenuItem refreshAssetsItem = new JMenuItem("Refresh Assets");
-        refreshAssetsItem.setToolTipText("Re-scan the assets folders for new or modified images");
+        JMenuItem refreshAssetsItem = new JMenuItem(loc.getString("menu_refresh_assets"));
+        refreshAssetsItem.setToolTipText(loc.getString("menu_refresh_assets_tooltip"));
         refreshAssetsItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
         refreshAssetsItem.addActionListener(e -> refreshAssets(frame));
         
-        JMenuItem undoItem = new JMenuItem("Undo");
-        undoItem.setToolTipText("Reverse the last action");
+        JMenuItem undoItem = new JMenuItem(loc.getString("menu_undo"));
+        undoItem.setToolTipText(loc.getString("menu_undo_tooltip"));
         undoItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK));
         undoItem.addActionListener(e -> {
         	canvas.getHistoryFunction().undo();
         	tileEditor.getStatusInfoBar().updateStatusUI();
         });
         
-        JMenuItem redoItem = new JMenuItem("Redo");
-        redoItem.setToolTipText("Reapply the last undone action");
+        JMenuItem redoItem = new JMenuItem(loc.getString("menu_redo"));
+        redoItem.setToolTipText(loc.getString("menu_redo_tooltip"));
         redoItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK));
         redoItem.addActionListener(e -> {
             canvas.getHistoryFunction().redo();
             tileEditor.getStatusInfoBar().updateStatusUI();
         });
 
-        JMenuItem fillItem = new JMenuItem("Fill Entire Map");
-        fillItem.setToolTipText("Replace every tile on the map with the currently selected tile");
+        JMenuItem fillItem = new JMenuItem(loc.getString("menu_fill_map"));
+        fillItem.setToolTipText(loc.getString("menu_fill_map_tooltip"));
         fillItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK));
         fillItem.addActionListener(e -> {
             if (canvas.getSelected().isTileMode()) {
                 canvas.fillMapWithTile(canvas.getSelected().getIndex());
-                canvas.getToastNotification().showToastNotification("Map filled..");
+                canvas.getToastNotification().showToastNotification(loc.getString("toast_map_filled"));
             } else {
-                JOptionPane.showMessageDialog(frame, "Select a tile first.");
+                JOptionPane.showMessageDialog(frame, loc.getString("dialog_select_tile_first"));
             }
         });
         
-        JMenuItem fillEmptyItem = new JMenuItem("Fill Empty Tiles");
-        fillEmptyItem.setToolTipText("Fill only the transparent/empty spots on the map with the selected tile");
+        JMenuItem fillEmptyItem = new JMenuItem(loc.getString("menu_fill_empty"));
+        fillEmptyItem.setToolTipText(loc.getString("menu_fill_empty_tooltip"));
         fillEmptyItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK));
         fillEmptyItem.addActionListener(e -> {
             if (canvas.getSelected().isTileMode()) {
                 canvas.fillEmptyTilesWithSelected();
-                canvas.getToastNotification().showToastNotification("Empty tiles filled..");
+                canvas.getToastNotification().showToastNotification(loc.getString("toast_empty_filled"));
             } else {
-                JOptionPane.showMessageDialog(frame, "Select a tile first before filling empty areas.");
+                JOptionPane.showMessageDialog(frame, loc.getString("dialog_select_tile_before_fill"));
             }
         });
         
-        JMenu extendMapMenu = new JMenu("Extend Map");
-        extendMapMenu.setToolTipText("Add a new row/column of tiles in the selected direction on the map");
+        JMenu extendMapMenu = new JMenu(loc.getString("menu_extend_map"));
+        extendMapMenu.setToolTipText(loc.getString("menu_extend_map_tooltip"));
 
      //helper method used for all four directions
      JMenuItem extendMapUp = createExtendMenuItem(
          frame, 
-         "Extend Up       \u2B06", 
-         "Extend Map Up", 
+         loc.getString("menu_extend_up"), 
+         loc.getString("menu_extend_up"), 
          KeyEvent.VK_UP, 
          MapDirection.UP
      );
 
      JMenuItem extendMapDown = createExtendMenuItem(
          frame, 
-         "Extend Down  \u2B07", 
-         "Extend Map Down", 
+         loc.getString("menu_extend_down"), 
+         loc.getString("menu_extend_down"), 
          KeyEvent.VK_DOWN, 
          MapDirection.DOWN
      );
 
      JMenuItem extendMapRight = createExtendMenuItem(
          frame, 
-         "Extend Right  \u27A1", 
-         "Extend Map Right", 
+         loc.getString("menu_extend_right"), 
+         loc.getString("menu_extend_right"), 
          KeyEvent.VK_RIGHT, 
          MapDirection.RIGHT
      );
 
      JMenuItem extendMapLeft = createExtendMenuItem(
          frame, 
-         "Extend Left    \u2B05", 
-         "Extend Map Left", 
+         loc.getString("menu_extend_left"), 
+         loc.getString("menu_extend_left"), 
          KeyEvent.VK_LEFT, 
          MapDirection.LEFT
      );
@@ -346,13 +349,15 @@ public class EditorMenuBar {
         extendMapMenu.add(extendMapLeft);
         extendMapMenu.add(extendMapRight);
         
-        JMenuItem autoIdItem = new JMenuItem("Auto-Assign Missing IDs");
+        JMenuItem autoIdItem = new JMenuItem(loc.getString("menu_auto_assign_ids"));
         autoIdItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0));
-        autoIdItem.setToolTipText("Finds textures without ID_ prefixes and assigns them unique IDs");
+        autoIdItem.setToolTipText(loc.getString("menu_auto_assign_ids_tooltip"));
         autoIdItem.addActionListener(e -> {
-            int confirm = JOptionPane.showConfirmDialog(frame, 
-                "This will rename files in your assets folder to include unique IDs. Proceed?", 
-                "Confirm Bulk Rename", JOptionPane.YES_NO_OPTION);
+            int confirm = JOptionPane.showOptionDialog(frame, 
+                loc.getString("menu_auto_assign_ids_confirm"), 
+                loc.getString("menu_auto_assign_ids_title"), 
+                JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, new Object[]{loc.getString("button_yes"), loc.getString("button_no")}, loc.getString("button_yes"));
             
             if (confirm == JOptionPane.YES_OPTION) {
                 performAutoIDAssignment(frame);
@@ -370,28 +375,30 @@ public class EditorMenuBar {
         editMenu.add(refreshAssetsItem);
         editMenu.add(autoIdItem);
         
-        JMenu toolsMenu = new JMenu("Tools");
+        JMenu toolsMenu = new JMenu(loc.getString("tools_menu"));
         
-        JMenuItem cleanupItem = new JMenuItem("Cleanup Missing Assets");
+        JMenuItem cleanupItem = new JMenuItem(loc.getString("menu_cleanup_assets"));
         cleanupItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, 0)); 
-        cleanupItem.setToolTipText("Removes all IDs from the map that don't exist in the textures folder");
+        cleanupItem.setToolTipText(loc.getString("menu_cleanup_assets_tooltip"));
         cleanupItem.addActionListener(e -> {
             //confirmation dialog before proceeding
-            int confirm = JOptionPane.showConfirmDialog(frame, 
-                "This will permanently remove missing textures from the map. Proceed?", 
-                "Confirm Cleanup", JOptionPane.YES_NO_OPTION);
+            int confirm = JOptionPane.showOptionDialog(frame, 
+                loc.getString("menu_cleanup_assets_confirm"), 
+                loc.getString("menu_cleanup_assets_title"), 
+                JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE,
+                null, new Object[]{loc.getString("button_yes"), loc.getString("button_no")}, loc.getString("button_yes"));
                 
             if (confirm == JOptionPane.YES_OPTION) {
                 canvas.cleanupMissingAssets();
             }
         });
         
-        JMenuItem scatterBrushItem = new JMenuItem("Custom Objects Scatter Brush");
-        scatterBrushItem.setToolTipText("Enable/Disable Random Brush mode for painting multiple IDs at once");
+        JMenuItem scatterBrushItem = new JMenuItem(loc.getString("menu_scatter_brush"));
+        scatterBrushItem.setToolTipText(loc.getString("menu_scatter_brush_tooltip"));
         scatterBrushItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, 0)); 
         scatterBrushItem.addActionListener(e -> {
         	if (this.getBrushIds().isEmpty()) {
-                JOptionPane.showMessageDialog(frame, "Ctrl+LClick objects in the 'Objects' palette first to add them to your brush!");
+                JOptionPane.showMessageDialog(frame, loc.getString("menu_scatter_brush_empty"));
                 return;
             }
             
@@ -402,10 +409,10 @@ public class EditorMenuBar {
             canvas.toggleBrushObject(idsArray);
             
             if(canvas.getSelected().isBrushTool()) {
-            	canvas.getToastNotification().showToastNotification("Scatter brush active with " + idsArray.length + " items!");
+            	canvas.getToastNotification().showToastNotification(loc.getFormattedString("menu_scatter_brush_active", idsArray.length));
             }
         	else {
-        		canvas.getToastNotification().showToastNotification("Scatter brush tool Off..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_scatter_brush_off"));
         	}
         });
         
@@ -431,39 +438,39 @@ public class EditorMenuBar {
         sliderPanel.add(spreadLabel);
         
         //clean the brush selections
-        JMenuItem cleanBrushItem = new JMenuItem("Cleanup Brush Selection");
-        cleanBrushItem.setToolTipText("Clear the list of selected tiles for your brush tool");
+        JMenuItem cleanBrushItem = new JMenuItem(loc.getString("menu_clean_brush"));
+        cleanBrushItem.setToolTipText(loc.getString("menu_clean_brush_tooltip"));
         cleanBrushItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0)); 
         cleanBrushItem.addActionListener(e -> {
         	this.getBrushIds().clear();
         	tileEditor.getStatusInfoBar().updateStatusUI();
         	canvas.setUseBrushObjectFalse();
-        	canvas.getToastNotification().showToastNotification("Brush selection cleaned..");
+        	canvas.getToastNotification().showToastNotification(loc.getString("menu_brush_cleaned"));
         });
         
-        JMenuItem chunkSelectionItem = new JMenuItem("Chunk Selection Tool");
-        chunkSelectionItem.setToolTipText("Drag to select a rectangular area for copying or exporting");
+        JMenuItem chunkSelectionItem = new JMenuItem(loc.getString("menu_chunk_selection"));
+        chunkSelectionItem.setToolTipText(loc.getString("menu_chunk_selection_tooltip"));
         chunkSelectionItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0)); 
         chunkSelectionItem.addActionListener(e -> {
         	canvas.toggleChunkSelectionMode();
         	if(canvas.getSelected().isChunkSelectionTool()) {
-        		canvas.getToastNotification().showToastNotification("Chunk selection tool On..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_chunk_selection_on"));
         	}
         	else {
-        		canvas.getToastNotification().showToastNotification("Chunk selection tool Off..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_chunk_selection_off"));
         	}
         });
         
-        JMenuItem notesToolItem = new JMenuItem("Annotated Notes Tool");
-        notesToolItem.setToolTipText("Click on the map grid to add or edit visual text reminders");
+        JMenuItem notesToolItem = new JMenuItem(loc.getString("menu_notes_tool"));
+        notesToolItem.setToolTipText(loc.getString("menu_notes_tool_tooltip"));
         notesToolItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
         notesToolItem.addActionListener(e -> {
         	canvas.setNotesTool();
         	if(canvas.getSelected().isNotesTool()) {
-        		canvas.getToastNotification().showToastNotification("Notes tool Active..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_notes_tool_on"));
         	}
         	else {
-        		canvas.getToastNotification().showToastNotification("Notes tool Off..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_notes_tool_off"));
         	}
         });
         
@@ -476,69 +483,69 @@ public class EditorMenuBar {
         toolsMenu.add(cleanupItem);
 
         //mode menu
-        JMenu modeMenu = new JMenu("Mode");
+        JMenu modeMenu = new JMenu(loc.getString("mode_menu"));
         
-        JMenuItem eraseObjectItem = new JMenuItem("Erase Object / NPC Mode");
-        eraseObjectItem.setToolTipText("Switch to Eraser mode to remove items from the map");
+        JMenuItem eraseObjectItem = new JMenuItem(loc.getString("menu_erase_mode"));
+        eraseObjectItem.setToolTipText(loc.getString("menu_erase_mode_tooltip"));
         eraseObjectItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, 0)); 
         eraseObjectItem.addActionListener(e -> {
         	canvas.setSelectedEraseMode();
         	if(canvas.getSelected().isEraseMode()) {
-        		canvas.getToastNotification().showToastNotification("Erasing mode On..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_erase_mode_on"));
         	}
         	else {
-        		canvas.getToastNotification().showToastNotification("Erasing mode Off..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_erase_mode_off"));
         	}
         });
         
-        JMenuItem objectsCount = new JMenuItem("Scene Items Count");
-        objectsCount.setToolTipText("Count and display the total number of items currently on the map");
+        JMenuItem objectsCount = new JMenuItem(loc.getString("menu_scene_count"));
+        objectsCount.setToolTipText(loc.getString("menu_scene_count_tooltip"));
         objectsCount.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_J, 0));
         objectsCount.addActionListener(e -> showObjectsCount(frame));
         
-        JMenuItem npcWalkArea = new JMenuItem("Place NPC Walk Area");
-        npcWalkArea.setToolTipText("Paint areas where NPCs are allowed to wander");
+        JMenuItem npcWalkArea = new JMenuItem(loc.getString("menu_npc_walk_area"));
+        npcWalkArea.setToolTipText(loc.getString("menu_npc_walk_area_tooltip"));
         npcWalkArea.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0));
         npcWalkArea.addActionListener(e -> {
         	canvas.togglePlaceNpcWalkArea();
         	if(canvas.getSelected().isNpcWalkAreaMode()) {
-        		canvas.getToastNotification().showToastNotification("Placing NPC Walk Area On..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_npc_walk_area_on"));
         	}
         	else {
-        		canvas.getToastNotification().showToastNotification("Placing NPC Walk Area Off..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_npc_walk_area_off"));
         	}
         });
 
-        JMenuItem toggleDarkMode = new JMenuItem("Toggle Dark Mode");
+        JMenuItem toggleDarkMode = new JMenuItem(loc.getString("menu_toggle_dark_mode"));
         toggleDarkMode.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, 0));
         toggleDarkMode.addActionListener(e -> {
         	if(tileEditor.getLoadedSetup().getDarkMode() == 1) {
         		tileEditor.getLoadedSetup().toggleDarkMode(false);
             	tileEditor.getLoadedSetup().setDarkMode(0);
-        		canvas.getToastNotification().showToastNotification("Switching dark mode Off..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_dark_mode_off"));
         	}
         	else {
         		tileEditor.getLoadedSetup().toggleDarkMode(true);
             	tileEditor.getLoadedSetup().setDarkMode(1);
-        		canvas.getToastNotification().showToastNotification("Switching dark mode On..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_dark_mode_on"));
         	}
         	
         	//save the new dark value inside the corresponding .txt file
             Utils.saveInitialDefaultValue("default_dark_mode.txt", String.valueOf(tileEditor.getLoadedSetup().getDarkMode()));
         });
         
-        JMenuItem toggleLocateMode = new JMenuItem("Locate Item");
-        toggleLocateMode.setToolTipText("Shows only the currently selected Tile / Object / NPC on the map");
+        JMenuItem toggleLocateMode = new JMenuItem(loc.getString("menu_locate_item"));
+        toggleLocateMode.setToolTipText(loc.getString("menu_locate_item_tooltip"));
         toggleLocateMode.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, 0));
         toggleLocateMode.addActionListener(e -> {
         	canvas.getCanvasViewState().toggleLocateMode();
         	canvas.getCanvasRenderer().repaint();
         	tileEditor.getStatusInfoBar().updateStatusUI();
         	if(canvas.getCanvasViewState().isLocateMode()) {
-        		canvas.getToastNotification().showToastNotification("Locating Item On..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_locate_on"));
         	}
         	else {
-        		canvas.getToastNotification().showToastNotification("Locating Item Off..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_locate_off"));
         	}
         });
         
@@ -550,131 +557,131 @@ public class EditorMenuBar {
         modeMenu.add(toggleDarkMode);
         
         //view menu
-        JMenu viewMenu = new JMenu("View");
+        JMenu viewMenu = new JMenu(loc.getString("view_menu"));
         
-        JMenuItem toggleNightMode = new JMenuItem("Preview Night Mode");
-        toggleNightMode.setToolTipText("Preview the map with a dark blue overlay to simulate night time");
+        JMenuItem toggleNightMode = new JMenuItem(loc.getString("menu_night_mode"));
+        toggleNightMode.setToolTipText(loc.getString("menu_night_mode_tooltip"));
         toggleNightMode.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, 0));
         toggleNightMode.addActionListener(e -> {
         	canvas.getCanvasViewState().toggleNightMode();
         	canvas.getCanvasRenderer().repaint();
         	if(canvas.getCanvasViewState().isNightMode()) {
-        		canvas.getToastNotification().showToastNotification("Preview night mode On..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_night_mode_on"));
         	}
         	else {
-        		canvas.getToastNotification().showToastNotification("Preview night mode Off..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_night_mode_off"));
         	}
         });
         
-        JMenuItem toggleNotesMap = new JMenuItem("Toggle Annotated Notes");
-        toggleNotesMap.setToolTipText("Show the notes added on the map");
+        JMenuItem toggleNotesMap = new JMenuItem(loc.getString("menu_toggle_notes"));
+        toggleNotesMap.setToolTipText(loc.getString("menu_toggle_notes_tooltip"));
         toggleNotesMap.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_DOWN_MASK));
         toggleNotesMap.addActionListener(e -> {
         	canvas.getCanvasViewState().toggleNotesTool();
         	canvas.getCanvasRenderer().repaint();
         	if(canvas.getCanvasViewState().isShowNotesTool()) {
-        		canvas.getToastNotification().showToastNotification("Preview annotated notes On..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_toggle_notes_on"));
         	}
         	else {
-        		canvas.getToastNotification().showToastNotification("Preview annotated notes Off..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_toggle_notes_off"));
         	}
         });
         
-        JMenuItem toggleGridItem = new JMenuItem("Toggle Grid");
-        toggleGridItem.setToolTipText("Show or hide the grid lines on the canvas");
+        JMenuItem toggleGridItem = new JMenuItem(loc.getString("menu_toggle_grid"));
+        toggleGridItem.setToolTipText(loc.getString("menu_toggle_grid_tooltip"));
         toggleGridItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, 0));
         toggleGridItem.addActionListener(e -> {
         	canvas.getCanvasViewState().toggleGrid();
         	canvas.getCanvasRenderer().repaint();
         	if(canvas.getCanvasViewState().isShowGrid()) {
-        		canvas.getToastNotification().showToastNotification("Toggled grid On..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_toggle_grid_on"));
         	}
         	else {
-        		canvas.getToastNotification().showToastNotification("Toggled grid Off..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_toggle_grid_off"));
         	}
         });
         
-        JMenuItem toggleTilePosition = new JMenuItem("Toggle Cursor Position");
-        toggleTilePosition.setToolTipText("Show the X,Y coordinates of the tile under the mouse");
+        JMenuItem toggleTilePosition = new JMenuItem(loc.getString("menu_toggle_cursor"));
+        toggleTilePosition.setToolTipText(loc.getString("menu_toggle_cursor_tooltip"));
         toggleTilePosition.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, 0));
         toggleTilePosition.addActionListener(e -> {
         	canvas.getCanvasViewState().toggleTilePosition();
         	if(canvas.getCanvasViewState().isShowTilePosition()) {
-        		canvas.getToastNotification().showToastNotification("Toggled cursor position On..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_toggle_cursor_on"));
         	}
         	else {
-        		canvas.getToastNotification().showToastNotification("Toggled cursor position Off..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_toggle_cursor_off"));
         	}
         });
         
-        JMenuItem toggleObjectPlacerPreview = new JMenuItem("Toggle Live Placement");
-        toggleObjectPlacerPreview.setToolTipText("Show a preview of the selected item attached to your cursor");
+        JMenuItem toggleObjectPlacerPreview = new JMenuItem(loc.getString("menu_toggle_placement"));
+        toggleObjectPlacerPreview.setToolTipText(loc.getString("menu_toggle_placement_tooltip"));
         toggleObjectPlacerPreview.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0));
         toggleObjectPlacerPreview.addActionListener(e -> {
         	canvas.getCanvasViewState().toggleObjectPreview();
         	canvas.getCanvasRenderer().repaint();
         	if(canvas.getCanvasViewState().isShowObjectPreview()) {
-        		canvas.getToastNotification().showToastNotification("Toggled live placement On..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_toggle_placement_on"));
         	}
         	else {
-        		canvas.getToastNotification().showToastNotification("Toggled live placement Off..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_toggle_placement_off"));
         	}
         });
         
-        JMenuItem toggleTileMap = new JMenuItem("Toggle Tile Map");
-        toggleTileMap.setToolTipText("Show or hide the background tile layer");
+        JMenuItem toggleTileMap = new JMenuItem(loc.getString("menu_toggle_tile_map"));
+        toggleTileMap.setToolTipText(loc.getString("menu_toggle_tile_map_tooltip"));
         toggleTileMap.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, 0));
         toggleTileMap.addActionListener(e -> {
         	canvas.getCanvasViewState().toggleTileMap();
         	canvas.getCanvasRenderer().repaint();
         	if(canvas.getCanvasViewState().isShowTileLayer()) {
-        		canvas.getToastNotification().showToastNotification("Toggled tiles On..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_toggle_tile_map_on"));
         	}
         	else {
-        		canvas.getToastNotification().showToastNotification("Toggled tiles Off..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_toggle_tile_map_off"));
         	}
         });
         
-        JMenuItem toggleObjectMap = new JMenuItem("Toggle Object Map");
-        toggleObjectMap.setToolTipText("Show or hide the object and decoration layer");
+        JMenuItem toggleObjectMap = new JMenuItem(loc.getString("menu_toggle_object_map"));
+        toggleObjectMap.setToolTipText(loc.getString("menu_toggle_object_map_tooltip"));
         toggleObjectMap.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, 0));
         toggleObjectMap.addActionListener(e -> {
         	canvas.getCanvasViewState().toggleObjectMap();
         	canvas.getCanvasRenderer().repaint();
         	if(canvas.getCanvasViewState().isShowObjectLayer()) {
-        		canvas.getToastNotification().showToastNotification("Toggled objects On..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_toggle_object_map_on"));
         	}
         	else {
-        		canvas.getToastNotification().showToastNotification("Toggled objects Off..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_toggle_object_map_off"));
         	}
         });
         
-        JMenuItem toggleNpcMap = new JMenuItem("Toggle NPC Map");
-        toggleNpcMap.setToolTipText("Show or hide the NPC layer");
+        JMenuItem toggleNpcMap = new JMenuItem(loc.getString("menu_toggle_npc_map"));
+        toggleNpcMap.setToolTipText(loc.getString("menu_toggle_npc_map_tooltip"));
         toggleNpcMap.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, 0));
         toggleNpcMap.addActionListener(e -> {
         	canvas.getCanvasViewState().toggleNpcMap();
         	canvas.getCanvasRenderer().repaint();
         	if(canvas.getCanvasViewState().isShowNpcLayer()) {
-        		canvas.getToastNotification().showToastNotification("Toggled NPCs On..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_toggle_npc_map_on"));
         	}
         	else {
-        		canvas.getToastNotification().showToastNotification("Toggled NPCs Off..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_toggle_npc_map_off"));
         	}
         });
         
-        JMenuItem toggleAutotile = new JMenuItem("Toggle Autotile");
-        toggleAutotile.setToolTipText("Enable/Disable automatic tile corner and edge transitions");
+        JMenuItem toggleAutotile = new JMenuItem(loc.getString("menu_toggle_autotile"));
+        toggleAutotile.setToolTipText(loc.getString("menu_toggle_autotile_tooltip"));
         toggleAutotile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0));
         toggleAutotile.addActionListener(e -> {
         	canvas.getCanvasViewState().toggleAutotile();
         	if(canvas.getCanvasViewState().isShowAutotile()) {
-        		canvas.getToastNotification().showToastNotification("Toggled autotiles On..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_toggle_autotile_on"));
     			canvas.getMapState().refreshAutotileMap();
     			canvas.getCanvasRenderer().repaint();
         	}
         	else {
-        		canvas.getToastNotification().showToastNotification("Toggled autotiles Off..");
+        		canvas.getToastNotification().showToastNotification(loc.getString("menu_toggle_autotile_off"));
         	}
         });
         
@@ -691,9 +698,9 @@ public class EditorMenuBar {
         viewMenu.add(toggleNightMode);
         
         //info menu
-        JMenu helpMenu = new JMenu("Info");
+        JMenu helpMenu = new JMenu(loc.getString("help_menu"));
         
-        JMenuItem legendItem = new JMenuItem("Application Legend");
+        JMenuItem legendItem = new JMenuItem(loc.getString("menu_legend"));
         legendItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, 0));
         legendItem.addActionListener(e -> {
             if (!tileEditor.getSearchFieldFunction().getSearchField().hasFocus()) {
@@ -714,7 +721,7 @@ public class EditorMenuBar {
 		//YouTube tutorial video links
         int thumbSize = 50;
 		try {
-	        JMenu tutorialMenu = new JMenu("Video Tutorials");
+	        JMenu tutorialMenu = new JMenu(loc.getString("menu_video_tutorials"));
 
 			BufferedImage thumbTutorialPart1 = ImageIO.read(new File(Utils.DEFAULT_BASE_PATH, "/icons/tutorial_part1.png"));
 			BufferedImage thumbTutorialPart2 = ImageIO.read(new File(Utils.DEFAULT_BASE_PATH, "/icons/tutorial_part2.png"));
@@ -724,15 +731,15 @@ public class EditorMenuBar {
 			ImageIcon ytIconPart2 = ImageUtils.createScaledIcon(thumbTutorialPart2, thumbSize, thumbSize);
 			ImageIcon ytIconPart3 = ImageUtils.createScaledIcon(thumbTutorialPart3, thumbSize, thumbSize);
 			
-			JMenuItem ytItemPart1 = new JMenuItem("Watch Video Tutorial - Part 1: Full Features & Asset Workflow", ytIconPart1);
-			JMenuItem ytItemPart2 = new JMenuItem("Watch Video Tutorial - Part 2: World Building & Performance", ytIconPart2);
-			JMenuItem ytItemPart3 = new JMenuItem("Watch Video Tutorial - Part 3: DarkMode & Workflow Upgrades", ytIconPart3);
+			JMenuItem ytItemPart1 = new JMenuItem(loc.getString("menu_yt_part1"), ytIconPart1);
+			JMenuItem ytItemPart2 = new JMenuItem(loc.getString("menu_yt_part2"), ytIconPart2);
+			JMenuItem ytItemPart3 = new JMenuItem(loc.getString("menu_yt_part3"), ytIconPart3);
 			
 			ytItemPart1.addActionListener(e -> {
 				try {
 					Desktop.getDesktop().browse(new URI("https://www.youtube.com/watch?v=Y0J-ezoVUCw"));
 				} catch (Exception ex) {
-					JOptionPane.showMessageDialog(frame, "Could not open browser: " + ex.getMessage());
+					JOptionPane.showMessageDialog(frame, loc.getFormattedString("menu_browser_error", ex.getMessage()));
 				}
 			});
 			
@@ -740,7 +747,7 @@ public class EditorMenuBar {
 				try {
 					Desktop.getDesktop().browse(new URI("https://www.youtube.com/watch?v=atrQ6VdNxC0"));
 				} catch (Exception ex) {
-					JOptionPane.showMessageDialog(frame, "Could not open browser: " + ex.getMessage());
+					JOptionPane.showMessageDialog(frame, loc.getFormattedString("menu_browser_error", ex.getMessage()));
 				}
 			});
 			
@@ -748,7 +755,7 @@ public class EditorMenuBar {
 				try {
 					Desktop.getDesktop().browse(new URI("https://www.youtube.com/watch?v=3fiajGU32Jg"));
 				} catch (Exception ex) {
-					JOptionPane.showMessageDialog(frame, "Could not open browser: " + ex.getMessage());
+					JOptionPane.showMessageDialog(frame, loc.getFormattedString("menu_browser_error", ex.getMessage()));
 				}
 			});
 			
@@ -763,8 +770,33 @@ public class EditorMenuBar {
 			e1.printStackTrace();
 		}
 		
+		helpMenu.addSeparator();
+		
+		//language selection submenu
+		JMenu langMenu = new JMenu(loc.getString("menu_language"));
+		
+		//dynamically create menu items for each available locale
+		java.util.Locale[] availableLocales = LocalizationManager.getAvailableLocales();
+		for(java.util.Locale availableLocale : availableLocales) {
+			String displayName = loc.getLanguageDisplayName(availableLocale);
+			JMenuItem langItem = new JMenuItem(displayName);
+			langItem.addActionListener(e -> {
+				LocalizationManager.getInstance().setLocale(availableLocale);
+				int response = JOptionPane.showOptionDialog(frame,
+					loc.getString("language_restart"),
+					loc.getString("menu_language"),
+					JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE,
+					null, new Object[]{loc.getString("button_yes"), loc.getString("button_no")}, loc.getString("button_yes"));
+				if(response == JOptionPane.YES_OPTION) {
+					LocalizationManager.restartApplication(availableLocale);
+				}
+			});
+			langMenu.add(langItem);
+		}
+		helpMenu.add(langMenu);
+		
 		//add about page to the help menu
-		JMenuItem aboutItem = new JMenuItem("About");
+		JMenuItem aboutItem = new JMenuItem(loc.getString("menu_about"));
 		aboutItem.addActionListener(e -> {
 			applicationLegend.showAbout(frame);
 		});
@@ -775,6 +807,8 @@ public class EditorMenuBar {
 	
 	//create a custom extension menu that can be called for every direction extension
 	private JMenuItem createExtendMenuItem(JFrame frame, String title, String dialogTitle, int keyCode, MapDirection direction) {
+		LocalizationManager loc = LocalizationManager.getInstance();
+		
 	    JMenuItem item = new JMenuItem(title);
 	    
 	    item.setAccelerator(KeyStroke.getKeyStroke(
@@ -786,8 +820,8 @@ public class EditorMenuBar {
 	        //prompt the user for input
 	        String input = JOptionPane.showInputDialog(
 	            frame, 
-	            "Enter the number of tiles to extend:",
-	            dialogTitle,
+	            loc.getString("extend_dialog_message"),
+	            loc.getFormattedString("extend_dialog_title", dialogTitle),
 	            JOptionPane.QUESTION_MESSAGE
 	        );
 	        //validate the input
@@ -798,18 +832,18 @@ public class EditorMenuBar {
 	                canvas.getExtendMapTool().extendOrShrinkMap(direction, delta);
 
 	                if(delta > 0) {
-		                canvas.getToastNotification().showToastNotification("Map extended..");
+		                canvas.getToastNotification().showToastNotification(loc.getString("toast_map_extended"));
 	                }
 	                else if(delta < 0) {
-		                canvas.getToastNotification().showToastNotification("Map reduced..");
+		                canvas.getToastNotification().showToastNotification(loc.getString("toast_map_reduced"));
 	                }
 
 	            } catch (NumberFormatException ex) {
 	                //handle case where the user enters non numeric text
 	                JOptionPane.showMessageDialog(
 	                    frame,
-	                    "Invalid input. Please enter a valid number.",
-	                    "Input Error",
+	                    loc.getString("extend_error_message"),
+	                    loc.getString("extend_error_title"),
 	                    JOptionPane.ERROR_MESSAGE
 	                );
 	            }
@@ -820,18 +854,21 @@ public class EditorMenuBar {
 	}
 	
 	private void showObjectsCount(JFrame frame) {
+		LocalizationManager loc = LocalizationManager.getInstance();
 		String message = getCountAllTiles();
-		JOptionPane.showMessageDialog(frame, message, "Total Number of Items in The Scene", JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(frame, message, loc.getString("scene_count_title"), JOptionPane.INFORMATION_MESSAGE);
 	}
 	
 	public String getCountAllTiles() {
-		String text = "Tiles Count:       " + Utils.countValidObjects(canvas.getMapState().getData().getTileMap());
-		text += "\nObjects Count:  " + Utils.countValidObjects(canvas.getMapState().getData().getObjectMap());
-		text += "\nNPCs Count:      " + Utils.countValidObjects(canvas.getMapState().getData().getNpcMap(), new int[]{1});
+		LocalizationManager loc = LocalizationManager.getInstance();
+		String text = loc.getFormattedString("scene_count_tiles", Utils.countValidObjects(canvas.getMapState().getData().getTileMap()));
+		text += "\n" + loc.getFormattedString("scene_count_objects", Utils.countValidObjects(canvas.getMapState().getData().getObjectMap()));
+		text += "\n" + loc.getFormattedString("scene_count_npcs", Utils.countValidObjects(canvas.getMapState().getData().getNpcMap(), new int[]{1}));
 		return text;
 	}
 	
 	private void performAutoIDAssignment(JFrame frame) {
+		LocalizationManager loc = LocalizationManager.getInstance();
 	    String[] categories = {Utils.TILES_NAME, Utils.OBJECTS_NAME, Utils.NPCS_NAME};
 	    int totalRenamed = 0;
 
@@ -848,16 +885,19 @@ public class EditorMenuBar {
 	    }
 
 	    if (totalRenamed > 0) {
-	        JOptionPane.showMessageDialog(frame, "Successfully renamed " + totalRenamed + " files.\nRefreshing palettes...");
+	        JOptionPane.showMessageDialog(frame, loc.getFormattedString("menu_auto_assign_ids_success", totalRenamed));
 	        refreshAssets(frame); 
 	    } else {
-	        JOptionPane.showMessageDialog(frame, "No files needed renaming.");
+	        JOptionPane.showMessageDialog(frame, loc.getString("menu_auto_assign_ids_none"));
 	    }
 	}
 	
     public void refreshAssets(JFrame frame) {
-        int confirm = JOptionPane.showConfirmDialog(frame, 
-            "This will re-scan the asset folders. Proceed?", "Refresh Assets", JOptionPane.YES_NO_OPTION);
+    	LocalizationManager loc = LocalizationManager.getInstance();
+        int confirm = JOptionPane.showOptionDialog(frame, 
+            loc.getString("refresh_confirm"), loc.getString("refresh_title"), 
+            JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE,
+            null, new Object[]{loc.getString("button_yes"), loc.getString("button_no")}, loc.getString("button_yes"));
         
         if (confirm == JOptionPane.YES_OPTION) {
         	loadNewResources();

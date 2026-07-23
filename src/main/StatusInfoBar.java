@@ -20,6 +20,7 @@ import com.formdev.flatlaf.ui.FlatLineBorder;
 
 import core.Tile;
 import data.Selection;
+import localization.LocalizationManager;
 import utils.ImageUtils;
 import utils.Utils;
 import view.TileCanvas;
@@ -45,66 +46,67 @@ public class StatusInfoBar {
     		return;
     	}
     	
+    	LocalizationManager loc = LocalizationManager.getInstance();
         Selection selection = canvas.getSelected();
         
         Icon icon = null;
-        String modeText = "Paint Tile Mode";
+        String modeText = loc.getString("status_paint_tile");
         
         if(this.canvas.getSelected().isChunkSelectionTool()) {
-        	modeText = "Chunk Selection Mode";
+        	modeText = loc.getString("status_chunk_selection");
         }
         //priority is NPC > Object > Tile
         else if(this.canvas.getSelected().isNpcWalkAreaMode()) {
-        	modeText = "Place NPC Walk Area Mode";
+        	modeText = loc.getString("status_npc_walk_area");
         }
         else if(this.canvas.getSelected().isBrushTool()) {
-        	modeText = "Custom Objects Brush Mode";
+        	modeText = loc.getString("status_brush_mode");
         }
         else if (selection.isNpcMode()) {
             Tile npc = this.canvas.getMapState().findNpcById(selection.getIndex());
             icon = ImageUtils.createScaledIcon(npc.getImage(), tileEditor.getLoadedSetup().getDefaultSelectedTile(), tileEditor.getLoadedSetup().getDefaultSelectedTile());
-            modeText = "Place NPC Mode";
+            modeText = loc.getString("status_place_npc");
         }
         else if (selection.isEraseMode()) {
         	icon = tileEditor.getEditorIcons().getEraserIcon();
-            modeText = "Erase Object / NPC Mode";
+            modeText = loc.getString("status_erase_mode");
         }
         else if (selection.isNotesTool()) {
         	icon = tileEditor.getEditorIcons().getNoteIcon();
-            modeText = "Annotated Notes Mode";
+            modeText = loc.getString("status_notes_mode");
         }
         else if (selection.isObjectMode()) {
             Tile obj = this.canvas.getMapState().findObjectById(selection.getIndex());
         	icon = ImageUtils.createScaledIcon(obj.getImage(), tileEditor.getLoadedSetup().getDefaultSelectedTile(), tileEditor.getLoadedSetup().getDefaultSelectedTile());
-        	modeText = "Place Object Mode";
+        	modeText = loc.getString("status_place_object");
         }
         else if (selection.isTileMode()) {
             Tile tile = this.canvas.getMapState().findTileById(selection.getIndex());
             icon = new ImageIcon(tile.getImage().getScaledInstance(tileEditor.getLoadedSetup().getDefaultSelectedTile(), tileEditor.getLoadedSetup().getDefaultSelectedTile(), Image.SCALE_SMOOTH));
-            modeText = "Paint Tile Mode";
+            modeText = loc.getString("status_paint_tile");
         }
         
-        selectionLabel.setText("Selection Preview:");
+        selectionLabel.setText(loc.getString("status_selection"));
         selectionPreview.setIcon(icon);
         
-        String statusBarText = "Mode: " + modeText;
+        String statusBarText = loc.getString("status_mode") + ": " + modeText;
         String stats = "";
         
         if(selection.isTileMode()) {
-        	stats = "Tile name: " + this.canvas.getMapState().findTileById(selection.getIndex()).getName() + " | ID: " + selection.getIndex();
+        	stats = loc.getString("status_tile_name") + this.canvas.getMapState().findTileById(selection.getIndex()).getName() + " | ID: " + selection.getIndex();
         }
         else if(selection.isObjectMode()) {
-        	stats = "Object name: " + this.canvas.getMapState().findObjectById(selection.getIndex()).getName() + " | ID: " + selection.getIndex();
+        	stats = loc.getString("status_object_name") + this.canvas.getMapState().findObjectById(selection.getIndex()).getName() + " | ID: " + selection.getIndex();
         }
         else if(selection.isNpcMode()) {
-        	stats = "NPC name: " + this.canvas.getMapState().findNpcById(selection.getIndex()).getName() + " | ID: " + selection.getIndex();
+        	stats = loc.getString("status_npc_name") + this.canvas.getMapState().findNpcById(selection.getIndex()).getName() + " | ID: " + selection.getIndex();
         }
         
-        statusBarText = "<html>Mode: " + modeText + 
+        statusBarText = "<html>" + loc.getString("status_mode") + ": " + modeText + 
                 "<br>" + stats;
         
         if(canvas.getCanvasViewState().isLocateMode()) {
-        	statusBarText += "<br>Found instances: " + canvas.getLocateCounter();
+        	statusBarText += "<br>" + loc.getString("status_found_instances") + canvas.getLocateCounter();
         }
         
         statusBarText += "</html>";

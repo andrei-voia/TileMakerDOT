@@ -129,8 +129,10 @@ public class ExtendMapTool {
 		}
 		mapState.refreshAllObjectsList();
 		historyFunction.resetSaveState();
-		keyController.keyRelease();
-
+		if(keyController != null) {
+			keyController.keyRelease();
+		}
+		
 		canvasRenderer.repaint();
 	}
 }
