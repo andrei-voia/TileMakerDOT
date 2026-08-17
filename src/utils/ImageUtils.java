@@ -4,7 +4,11 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 public final class ImageUtils {
@@ -52,5 +56,19 @@ public final class ImageUtils {
         
         //create the ImageIcon from the scaled Image
         return new ImageIcon(scaledImage);
+    }
+    
+    //read the given language flag images from the assets flag folder and scales them
+    public static Icon getFlagIcon(String languageCode, int imageScale) {
+        try {
+			ImageIO.read(new File(Utils.DEFAULT_BASE_PATH, "/icons/localization_flags/" + languageCode.toLowerCase() + ".png"));
+
+			return new ImageIcon(ImageIO.read(new File(Utils.DEFAULT_BASE_PATH, "/icons/localization_flags/" + languageCode.toLowerCase() + ".png"))
+            		.getScaledInstance(imageScale, -1, Image.SCALE_SMOOTH));
+        } catch (IOException e) {
+			System.out.println("WARNING: localization flags not found for " + languageCode.toLowerCase() + ", returning null image");
+	        //fallback to text only if icon is missing
+	        return null; 
+		}
     }
 }

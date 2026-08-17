@@ -16,6 +16,7 @@ import data.CanvasViewState;
 import data.MapNote;
 import data.MapState;
 import data.NoteColor;
+import localization.LocalizationManager;
 import data.ButtonsOptions;
 import tools.BrushTool;
 import tools.ChunkSelectionTool;
@@ -40,6 +41,8 @@ public class MouseController extends MouseAdapter {
 	private Point dragStartPoint; 		//for panning
 	private Point selectionStartPoint; 	//for rectangle selection
 	
+	private LocalizationManager loc;
+	
 	public MouseController(TileCanvas tileCanvas, CanvasViewState canvasViewState,
 			MapState mapState, Camera camera, HistoryFunction historyFunction,
 			ChunkSelectionTool chunkSelectionTool, BrushTool brushTool) {
@@ -50,6 +53,8 @@ public class MouseController extends MouseAdapter {
 		this.historyFunction = historyFunction;
 		this.chunkSelectionTool = chunkSelectionTool;
 		this.brushTool = brushTool;
+		
+		loc = LocalizationManager.getInstance();
 	}
 	
 	@Override
@@ -268,7 +273,17 @@ public class MouseController extends MouseAdapter {
 	                	mapState.getData().setObjectMap(row, col, tileCanvas.getDraggedItem().getIndex());
 	                	mapState.addNewSortedObject(row, col, true);
 	                }
-	                tileCanvas.getToastNotification().showToastNotification("Moved " + tileCanvas.getDraggedItem().getType());
+	                
+	                //build and print toast for moving object or NPC
+	                String moved_text = "";
+	                if(tileCanvas.getDraggedItem().getType().equals(ItemType.OBJECT)) {
+	                	moved_text = loc.getString("toast_moved_object");
+	                }
+	                else {
+	                	moved_text = loc.getString("toast_moved_npc");
+	                }
+	                
+	                tileCanvas.getToastNotification().showToastNotification(moved_text);
 	            }
 	        }
 	        //reset state
@@ -554,7 +569,7 @@ public class MouseController extends MouseAdapter {
 	    int result = JOptionPane.showOptionDialog(
 	    	SwingUtilities.getWindowAncestor(e.getComponent()),
 	      	configPanel,
-	      	"Configure Editor Pin",
+	      	loc.getString("note_configure_title"),
 	      	JOptionPane.DEFAULT_OPTION,
 	       	JOptionPane.PLAIN_MESSAGE,
 	       	null,
@@ -566,16 +581,16 @@ public class MouseController extends MouseAdapter {
 	      	if (result == 0 && !configPanel.getNoteText().isEmpty()) { //save clicked
 	          	existingNote.setText(configPanel.getNoteText());
 	           	existingNote.setColor(configPanel.getSelectedColor());
-	          	tileCanvas.getToastNotification().showToastNotification("Note saved successfully!");
+	          	tileCanvas.getToastNotification().showToastNotification(loc.getString("note_saved"));
 	          	enableQuickSave();
 	       	} else if (result == 1) { //remove clicked
 	          	tileCanvas.getAnnotatedNotesTool().removeMapNote(existingNote);
-	           	tileCanvas.getToastNotification().showToastNotification("Note removed.");
+	           	tileCanvas.getToastNotification().showToastNotification(loc.getString("note_removed"));
 	          	enableQuickSave();
 	      	}
 		} else if (result == 0 && !configPanel.getNoteText().isEmpty()) { //save clicked for new note
 			tileCanvas.getAnnotatedNotesTool().addNote(col, row, configPanel.getNoteText(), configPanel.getSelectedColor());
-	      	tileCanvas.getToastNotification().showToastNotification("Note saved successfully!");
+	      	tileCanvas.getToastNotification().showToastNotification(loc.getString("note_saved"));
 	    	enableQuickSave();
 	  	}
 	}

@@ -18,6 +18,7 @@ import data.CanvasViewState;
 import data.MapNote;
 import data.MapState;
 import data.NoteColor;
+import localization.LocalizationManager;
 import tools.ChunkSelectionTool;
 import utils.ImageUtils;
 import utils.Utils;
@@ -32,6 +33,8 @@ public class MapExporter {
 	private CanvasViewState canvasViewState;
 	private CanvasRenderer canvasRenderer;
 	
+	private LocalizationManager loc;
+	
 	public MapExporter(TileCanvas tileCanvas, MapState mapState, 
 			ChunkSelectionTool chunkSelectionTool, CanvasViewState canvasViewState,
 			CanvasRenderer canvasRenderer) {
@@ -40,6 +43,8 @@ public class MapExporter {
 		this.chunkSelectionTool = chunkSelectionTool;
 		this.canvasViewState = canvasViewState;
 		this.canvasRenderer = canvasRenderer;
+		
+		this.loc = LocalizationManager.getInstance();
 	}
 	
 	public void saveChunk(File file) {
@@ -52,7 +57,7 @@ public class MapExporter {
 					chunkSelectionTool.getMapChunk().getWalkArea());
 		}
 		else {
-			JOptionPane.showMessageDialog(canvasRenderer, "Select a chunk before saving!", "Message",
+			JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_select_chunk"), loc.getString("dialog_default_title"),
 					JOptionPane.INFORMATION_MESSAGE);
 		}
 	}
@@ -167,11 +172,11 @@ public class MapExporter {
 			mapState.getCacheData().setCanQuickSave(false);
 			
 			if (showMessage) {
-				JOptionPane.showMessageDialog(canvasRenderer, "Map saved successfully to " + file.getName(), "Save Success",
+				JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_map_save_success") + file.getName(), loc.getString("dialog_save_success"),
 						JOptionPane.INFORMATION_MESSAGE);
 			}
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(canvasRenderer, "Error saving map: " + e.getMessage(), "Save Error",
+			JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_error_map_save") + e.getMessage(), loc.getString("dialog_save_error"),
 					JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
@@ -363,10 +368,10 @@ public class MapExporter {
 					+ " \"width\":" + mapState.getData().getCols() + "\r\n"
 					+ "}");
 
-			JOptionPane.showMessageDialog(canvasRenderer, "Tile map exported successfully to " + file.getName(), "Save Success",
+			JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_tile_export_success") + file.getName(), loc.getString("dialog_save_success"),
 					JOptionPane.INFORMATION_MESSAGE);
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(canvasRenderer, "Error exporting map: " + e.getMessage(), "Save Error",
+			JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_error_export_map") + e.getMessage(), loc.getString("dialog_save_error"),
 					JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
@@ -384,7 +389,7 @@ public class MapExporter {
 	    //export the map linking it to the TSX
 	    exporter.exportTMX(tmxFile, tsxFile.getName(), mapState.getData().getTileMap(), mapState.getRegistry().getAllSortedItems());
 	    
-	    tileCanvas.getToastNotification().showToastNotification("Godot files (.tmx/.tsx) exported!");
+	    tileCanvas.getToastNotification().showToastNotification(loc.getString("dialog_tmx_exported"));
 	}
 	
 	public void exportCsvFormat(File file) {
@@ -401,7 +406,7 @@ public class MapExporter {
 	    try (PrintWriter pwt = new PrintWriter(new FileOutputStream(tilesFile))) {
 			pwt.println(this.generateTileLayer(-1, ""));
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(canvasRenderer, "Error exporting map: " + e.getMessage(), "Save Error",
+			JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_error_export_map") + e.getMessage(), loc.getString("dialog_save_error"),
 					JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
@@ -409,7 +414,7 @@ public class MapExporter {
 	    try (PrintWriter pwo = new PrintWriter(new FileOutputStream(objectsFile))) {
 			pwo.println(this.generateObjectLayer(-1, ""));
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(canvasRenderer, "Error exporting map: " + e.getMessage(), "Save Error",
+			JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_error_export_map") + e.getMessage(), loc.getString("dialog_save_error"),
 					JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
@@ -417,12 +422,12 @@ public class MapExporter {
 	    try (PrintWriter pwn = new PrintWriter(new FileOutputStream(npcsFile))) {
 			pwn.println(this.generateNpcLayer(-1, ""));
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(canvasRenderer, "Error exporting map: " + e.getMessage(), "Save Error",
+			JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_error_export_map") + e.getMessage(), loc.getString("dialog_save_error"),
 					JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
 	    
-		JOptionPane.showMessageDialog(canvasRenderer, "Tile map exported successfully to " + file.getName(), "Save Success",
+		JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_tile_export_success") + file.getName(), loc.getString("dialog_save_success"),
 				JOptionPane.INFORMATION_MESSAGE);
 	}
 	
@@ -440,7 +445,7 @@ public class MapExporter {
 	    try (PrintWriter pwt = new PrintWriter(new FileOutputStream(tilesFile))) {
 			pwt.println(this.generateLvlTileMap());
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(canvasRenderer, "Error exporting map: " + e.getMessage(), "Save Error",
+			JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_error_export_map") + e.getMessage(), loc.getString("messages_en.properties"),
 					JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
@@ -448,7 +453,7 @@ public class MapExporter {
 	    try (PrintWriter pwo = new PrintWriter(new FileOutputStream(objectsFile))) {
 			pwo.println(this.generateLvlObjectMap());
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(canvasRenderer, "Error exporting map: " + e.getMessage(), "Save Error",
+			JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_error_export_map") + e.getMessage(), loc.getString("messages_en.properties"),
 					JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
@@ -456,12 +461,12 @@ public class MapExporter {
 	    try (PrintWriter pwn = new PrintWriter(new FileOutputStream(npcsFile))) {
 			pwn.println(this.generateLvlNpcMap());
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(canvasRenderer, "Error exporting map: " + e.getMessage(), "Save Error",
+			JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_error_export_map") + e.getMessage(), loc.getString("dialog_save_error"),
 					JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
 	    
-		JOptionPane.showMessageDialog(canvasRenderer, "Tile map exported successfully to " + file.getName(), "Save Success",
+		JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_tile_export_success") + file.getName(), loc.getString("dialog_save_success"),
 				JOptionPane.INFORMATION_MESSAGE);
 	}
 
@@ -591,7 +596,7 @@ public class MapExporter {
 			}
 			
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(canvasRenderer, "Error saving map: " + e.getMessage(), "Save Error",
+			JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_error_map_save") + e.getMessage(), loc.getString("dialog_save_error"),
 					JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
@@ -610,7 +615,7 @@ public class MapExporter {
 	    
 	    //check if the reduced image is still too large just as a safety check
 	    if (calculatedWidth > Integer.MAX_VALUE || calculatedHeight > Integer.MAX_VALUE || calculatedWidth * calculatedHeight > Integer.MAX_VALUE) {
-	        JOptionPane.showMessageDialog(canvasRenderer, "Error: Map size is too large even after scaling down. COLS/ROWS must be reduced.", "Export Error", JOptionPane.ERROR_MESSAGE);
+	        JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_error_map_too_large"), loc.getString("dialog_export_error"), JOptionPane.ERROR_MESSAGE);
 	        return; 
 	    }
 	    
@@ -691,11 +696,11 @@ public class MapExporter {
 	        }
 
 	        ImageIO.write(exportImage, format, file);
-	        JOptionPane.showMessageDialog(canvasRenderer, "Image exported successfully as " + file.getName(), "Export Success",
+	        JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_export_success_image") + file.getName(), loc.getString("dialog_export_success"),
 	                JOptionPane.INFORMATION_MESSAGE);
 
 	    } catch (IOException e) {
-	        JOptionPane.showMessageDialog(canvasRenderer, "Error exporting image: " + e.getMessage(), "Export Error",
+	        JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_error_export_image") + e.getMessage(), loc.getString("dialog_export_error"),
 	                JOptionPane.ERROR_MESSAGE);
 	    } finally {
 	        g2d.dispose();

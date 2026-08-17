@@ -15,6 +15,7 @@ import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
 
 import data.NoteColor;
+import localization.LocalizationManager;
 
 public class NoteConfigPanel extends JPanel {
 
@@ -23,12 +24,16 @@ public class NoteConfigPanel extends JPanel {
 	private JTextField inputField;
 	private JComboBox<NoteColor> colorDropdown;
     private JPanel colorPreview;
+    
+    private LocalizationManager loc;
 
     public NoteConfigPanel(String defaultText, NoteColor existingColor) {
         //vertical stacked layout configuration
         setLayout(new GridLayout(4, 1, 4, 4));
+        
+        loc = LocalizationManager.getInstance();
 
-        add(new JLabel("Enter Map Annotation Note:"));
+        add(new JLabel(loc.getString("note_enter_text")));
         inputField = new JTextField(defaultText, 20);
         add(inputField);
         
@@ -49,7 +54,7 @@ public class NoteConfigPanel extends JPanel {
             public void ancestorMoved(AncestorEvent event) {}
         });
 
-        add(new JLabel("Select Note Label Color:"));
+        add(new JLabel(loc.getString("note_label_color")));
 
         //row alignment wrapper for dropdown + Square Preview block
         JPanel selectionRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));

@@ -14,6 +14,7 @@ import data.CanvasViewState;
 import data.MapNote;
 import data.MapState;
 import data.NoteColor;
+import localization.LocalizationManager;
 import tools.ChunkSelectionTool;
 import utils.Utils;
 import view.CanvasRenderer;
@@ -32,6 +33,8 @@ public class MapLoader {
 	private CanvasViewState canvasViewState;
 	private CanvasRenderer canvasRenderer;
 	
+	private LocalizationManager loc;
+	
 	public MapLoader(TileCanvas tileCanvas, MapState mapState, 
 			ChunkSelectionTool chunkSelectionTool, CanvasViewState canvasViewState,
 			CanvasRenderer canvasRenderer) {
@@ -40,6 +43,8 @@ public class MapLoader {
 		this.chunkSelectionTool = chunkSelectionTool;
 		this.canvasViewState = canvasViewState;
 		this.canvasRenderer = canvasRenderer;
+
+		loc = LocalizationManager.getInstance();
 	}
 	
 	public void loadChunk(File file) {
@@ -80,19 +85,19 @@ public class MapLoader {
 			
 			tileCanvas.getTileEditor().getStatusInfoBar().updateStatusUI();
 
-			JOptionPane.showMessageDialog(null, "Chunk imported successfully from " + file.getName(), "Load Success",
+			JOptionPane.showMessageDialog(null, loc.getString("dialog_chunk_load_success") + file.getName(), loc.getString("dialog_load_success"),
 					JOptionPane.INFORMATION_MESSAGE);
 
 		} catch (FileNotFoundException e) {
-			JOptionPane.showMessageDialog(null, "File not found.", "Load Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, loc.getString("dialog_file_not_found"), loc.getString("dialog_load_error"), JOptionPane.ERROR_MESSAGE);
 			System.exit(0);
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(null, "Error reading map data: " + e.getMessage(), "Load Error",
+			JOptionPane.showMessageDialog(null, loc.getString("dialog_error_map_reading") + e.getMessage(), loc.getString("dialog_load_error"),
 					JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 			System.exit(0);
 		} catch (NumberFormatException e) {
-			JOptionPane.showMessageDialog(null, "Map file contains non-numeric data.", "Load Error",
+			JOptionPane.showMessageDialog(null, loc.getString("dialog_error_map_non_numeric"), loc.getString("dialog_load_error"),
 					JOptionPane.ERROR_MESSAGE);
 			System.exit(0);
 		}
@@ -159,19 +164,19 @@ public class MapLoader {
 			tileCanvas.getHistoryFunction().resetSaveState();
 			
 			canvasRenderer.repaint();
-			JOptionPane.showMessageDialog(null, "Map loaded successfully from " + file.getName(), "Load Success",
+			JOptionPane.showMessageDialog(null, loc.getString("dialog_map_load_success") + file.getName(), loc.getString("dialog_load_success"),
 					JOptionPane.INFORMATION_MESSAGE);
 
 		} catch (FileNotFoundException e) {
-			JOptionPane.showMessageDialog(null, "File not found.", "Load Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, loc.getString("dialog_file_not_found"), loc.getString("dialog_load_error"), JOptionPane.ERROR_MESSAGE);
 			System.exit(0);
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(null, "Error reading map data: " + e.getMessage(), "Load Error",
+			JOptionPane.showMessageDialog(null, loc.getString("dialog_error_map_reading") + e.getMessage(), loc.getString("dialog_load_error"),
 					JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 			System.exit(0);
 		} catch (NumberFormatException e) {
-			JOptionPane.showMessageDialog(null, "Map file contains non-numeric data.", "Load Error",
+			JOptionPane.showMessageDialog(null, loc.getString("dialog_error_map_non_numeric"), loc.getString("dialog_load_error"),
 					JOptionPane.ERROR_MESSAGE);
 			System.exit(0);
 		}
@@ -288,7 +293,7 @@ public class MapLoader {
 			}
 			
 			JOptionPane.showMessageDialog(null, errorMessage.toString(),
-					"Missing Assets Detected", JOptionPane.WARNING_MESSAGE);
+					loc.getString("dialog_missing_assets"), JOptionPane.WARNING_MESSAGE);
 		}
 	}
 }

@@ -18,6 +18,7 @@ import io.KeyController;
 import io.MapExporter;
 import io.MapLoader;
 import io.MouseController;
+import localization.LocalizationManager;
 import main.TileEditor;
 import tools.AnnotatedNotesTool;
 import tools.BrushTool;
@@ -218,15 +219,16 @@ public class TileCanvas {
 	        }
 	    }
 	    
+	    LocalizationManager loc = LocalizationManager.getInstance();
+	    
 	    //if the autoTile is not active then do not reset autoTile Map to save time
 		if (canvasViewState.isShowAutotile())
 			mapState.refreshAutotileMap();
 		mapState.refreshAllObjectsList();
 		canvasRenderer.repaint();
 	    JOptionPane.showMessageDialog(canvasRenderer, 
-	        "Cleanup complete! Removed invalid references: " + removedTilesCount + " tiles, " + 
-	    removedObjectsCount + " objects and " + removedNPCsCount + " NPCs.", 
-	        "Map Cleanup", 
+	    	loc.getFormattedString("menu_cleanup_complete", removedTilesCount, removedObjectsCount, removedNPCsCount), 
+	    	loc.getString("menu_cleanup_title"), 
 	        JOptionPane.INFORMATION_MESSAGE);
 	}
 	

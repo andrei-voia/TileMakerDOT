@@ -10,6 +10,7 @@ import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 
+import localization.LocalizationManager;
 import utils.Utils;
 
 public class LoadedSetup {
@@ -33,13 +34,17 @@ public class LoadedSetup {
 		loadSetup();
 	}
 	
-	public void loadSetup() {
+    public void loadSetup() {
         //initial setup and input dialog
     	defaultSelectedTile = (int) (Toolkit.getDefaultToolkit().getScreenSize().height * 0.0595); //68
-    	
+    
         defaultSizes = Utils.loadDefaultGridSizes();
         resourceBasePath = Utils.loadInitialDefaultValues("default_assets_path.txt");
         tileSizeLoaded = Utils.loadInitialDefaultValues("default_tile_size.txt");
+        
+        //load saved language preference
+        String savedLanguage = Utils.loadInitialDefaultValues("default_language.txt");
+        LocalizationManager.getInstance().loadSavedLocale(savedLanguage);
         
         try {
         	frameDuration =  Long.parseLong(Utils.loadInitialDefaultValues("default_frame_ms_duration.txt"));
@@ -53,11 +58,10 @@ public class LoadedSetup {
         	}
 
         } catch(NumberFormatException e) {
+        	LocalizationManager loc = LocalizationManager.getInstance();
         	JOptionPane.showMessageDialog(null,
-        	        "Warning: Invalid value found in 'default_frame_ms_duration.txt'.\n" +
-        	        "The value must be a whole number (e.g. 200).\n\n" +
-        	        "The application will use the default speed: 200ms.",
-        	        "Configuration Error",
+        			loc.getString("dialog_invalid_load"),
+        	        loc.getString("Configuration Error"),
         	        JOptionPane.WARNING_MESSAGE);
         }
 	}

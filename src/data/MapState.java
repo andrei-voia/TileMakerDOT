@@ -16,6 +16,7 @@ import core.Autotile;
 import core.PointC;
 import core.Tile;
 import core.TileObject;
+import localization.LocalizationManager;
 import utils.Utils;
 
 public class MapState {
@@ -55,14 +56,15 @@ public class MapState {
 	}
 	
 	public void checkLoadingTexturesIntegrity(List<Tile> tiles, List<Tile> objects, List<Tile> npcs) {
+		LocalizationManager loc = LocalizationManager.getInstance();
+		
 		//check if there are duplicate IDs in the file manager where the textures are
 		Tile tileCheck = Utils.findFirstDuplicateTile(tiles);
 		if (tileCheck != null) {
 			JOptionPane
 					.showMessageDialog(null,
-							"Error loading tiles from folders: Duplicate texture '" + tileCheck.getName()
-									+ "' with ID '" + tileCheck.getId() + "'",
-							"Loading Error", JOptionPane.ERROR_MESSAGE);
+							loc.getFormattedString("dialog_error_load_duplicate_texture", tileCheck.getName(), tileCheck.getId()),
+							loc.getString("dialog_load_error"), JOptionPane.ERROR_MESSAGE);
 			System.exit(0);
 		}
 
@@ -70,19 +72,17 @@ public class MapState {
 		if (objectCheck != null) {
 			JOptionPane
 					.showMessageDialog(null,
-							"Error loading objects from folders: Duplicate texture '" + objectCheck.getName()
-									+ "' with ID '" + objectCheck.getId() + "'",
-							"Loading Error", JOptionPane.ERROR_MESSAGE);
+							loc.getFormattedString("dialog_error_load_duplicate_texture", objectCheck.getName(), objectCheck.getId()),
+							loc.getString("dialog_load_error"), JOptionPane.ERROR_MESSAGE);
 			System.exit(0);
 		}
 
 		Tile npcCheck = Utils.findFirstDuplicateTile(npcs);
 		if (npcCheck != null) {
 			JOptionPane
-					.showMessageDialog(
-							null, "Error loading npcs from folders: Duplicate texture '" + npcCheck.getName()
-									+ "' with ID '" + npcCheck.getId() + "'",
-							"Loading Error", JOptionPane.ERROR_MESSAGE);
+					.showMessageDialog(null,
+							loc.getFormattedString("dialog_error_load_duplicate_texture", npcCheck.getName(), npcCheck.getId()),
+							loc.getString("dialog_load_error"), JOptionPane.ERROR_MESSAGE);
 			System.exit(0);
 		}
 	}

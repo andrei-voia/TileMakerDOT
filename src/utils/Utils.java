@@ -20,6 +20,7 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
 import core.Tile;
+import localization.LocalizationManager;
 
 public final class Utils {
 	
@@ -149,11 +150,12 @@ public final class Utils {
 	}
 	
     public static JDialog createLoadingDialog(JFrame parent) {
-        JDialog loadingDialog = new JDialog(parent, "Loading...", true); //true makes it modal
+    	LocalizationManager loc = LocalizationManager.getInstance();
+        JDialog loadingDialog = new JDialog(parent, loc.getString("loading_title"), true); //true makes it modal
         loadingDialog.setUndecorated(true); //remove borders of the tool to look better and cleaner
         
         //add a simple label or message
-        JLabel message = new JLabel("Loading Resources... Please wait.", SwingConstants.CENTER);
+        JLabel message = new JLabel(loc.getString("loading_message"), SwingConstants.CENTER);
         message.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
         loadingDialog.add(message);
         

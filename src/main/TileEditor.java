@@ -23,6 +23,7 @@ import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 
 import core.Tile;
+import localization.LocalizationManager;
 import tools.SearchFieldFunction;
 import utils.ApplicationLegend;
 import utils.IDLoader;
@@ -261,10 +262,12 @@ public class TileEditor {
         searchPanel.add(searchFieldFunction.getClearButton(), BorderLayout.EAST);
         searchPanel.add(searchFieldFunction.getSearchLabel(), BorderLayout.WEST);
         
+        LocalizationManager loc = LocalizationManager.getInstance();
+        
         //add the objects and NPCs tabs view
         JTabbedPane itemTabs = new JTabbedPane();
-        itemTabs.addTab(Utils.OBJECTS_NAME, objectTabs);
-        itemTabs.addTab(Utils.NPCS_NAME, npcTabs);
+        itemTabs.addTab(loc.getString("objects_tab"), objectTabs);
+        itemTabs.addTab(loc.getString("npcs_tab"), npcTabs);
         
         //add the status down on the left side bar
         JPanel controlPanel = createControlPanel();
@@ -300,8 +303,8 @@ public class TileEditor {
         //show message if any hidden folders were found
         if(!assetPalette.getHiddenFolders().isEmpty()) {
             JOptionPane.showMessageDialog(
-                    frame, "The following folders will be hidden: " + assetPalette.getHiddenFolders().toString(),
-                    "Hidden folders detected", JOptionPane.INFORMATION_MESSAGE);
+                    frame, loc.getFormattedString("hidden_folders_message", assetPalette.getHiddenFolders().toString()),
+                    loc.getString("hidden_folders_detected"), JOptionPane.INFORMATION_MESSAGE);
         }
 
         //forced revalidation after GUI is visible
@@ -352,10 +355,11 @@ public class TileEditor {
     
     //displays a confirmation dialog and exits the application if the user confirms
     private void confirmExit(JFrame frame) {
+    	LocalizationManager loc = LocalizationManager.getInstance();
         int response = JOptionPane.showConfirmDialog(
             frame,
-            "Are you sure you want to exit? Any unsaved work will be lost.",
-            "Confirm Exit",
+            loc.getString("exit_confirm_message"),
+            loc.getString("exit_confirm_title"),
             JOptionPane.YES_NO_OPTION,
             JOptionPane.WARNING_MESSAGE
         );

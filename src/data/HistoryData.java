@@ -5,6 +5,8 @@ import java.util.Deque;
 
 import javax.swing.JOptionPane;
 
+import localization.LocalizationManager;
+
 public class HistoryData {
 
 	private static int MAX_UNDO_STATES = 20;
@@ -54,9 +56,8 @@ public class HistoryData {
 	        //inform the user about the RAM usage and how it was solved
 	        JOptionPane.showMessageDialog(
 	            null,
-	            "The system ran out of RAM memory while processing the history action.\n" +
-	            "The Undo/Redo history has been cleared and reduced to " + MAX_UNDO_STATES + " Undo states to prevent a crash. Please save your work.",
-	            "System Memory Warning",
+	            LocalizationManager.getInstance().getFormattedString("dialog_memory_warning_message", MAX_UNDO_STATES),
+	            LocalizationManager.getInstance().getString("dialog_memory_warning"),
 	            JOptionPane.ERROR_MESSAGE
 	        );
 	    }

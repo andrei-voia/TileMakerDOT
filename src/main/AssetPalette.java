@@ -22,6 +22,7 @@ import javax.swing.Scrollable;
 
 import core.TabData;
 import core.Tile;
+import localization.LocalizationManager;
 import utils.ImageUtils;
 import utils.Utils;
 import view.TileCanvas;
@@ -44,6 +45,8 @@ public class AssetPalette {
     
     private TileCanvas canvas;
     private TileEditor tileEditor;
+    
+    private LocalizationManager loc = LocalizationManager.getInstance();
     
 	public AssetPalette(TileEditor tileEditor, TileCanvas canvas) {
 		this.tileEditor = tileEditor;
@@ -265,7 +268,8 @@ public class AssetPalette {
         	JButton btn = new JButton(icon);
             int imageTileWidth = asset.getImage().getWidth() / tileEditor.getLoadedSetup().getTileSize();
             int imageTileHeight = asset.getImage().getHeight() / tileEditor.getLoadedSetup().getTileSize();
-            btn.setToolTipText(asset.getName() + " - ID:" + asset.getId() + " - SIZE:" + imageTileWidth + "x" + imageTileHeight);
+            btn.setToolTipText(asset.getName() + " - ID:" + asset.getId() + " - " + 
+            LocalizationManager.getInstance().getString("hover_object_size") + ":" + imageTileWidth + "x" + imageTileHeight);
             btn.setPreferredSize(new Dimension(defaultTileSizeSelection, defaultTileSizeSelection));
             btn.putClientProperty(clientPropertyKey, asset.getId());
             
@@ -295,7 +299,8 @@ public class AssetPalette {
                                     canvas.useBrushObject(idsArray);
                                 }
                             }
-                            canvas.getToastNotification().showToastNotification("Brush now has " + tileEditor.getEditorMenuBar().getBrushIds().size() + " objects..");
+                            
+                            canvas.getToastNotification().showToastNotification(loc.getFormattedString("toast_brush_count", tileEditor.getEditorMenuBar().getBrushIds().size()));
                         } else {
                             //selection logic
                             canvas.setSelectedObjectIndex(id);

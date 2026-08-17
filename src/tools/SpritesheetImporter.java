@@ -32,6 +32,7 @@ import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import localization.LocalizationManager;
 import main.TileEditor;
 import utils.ImageUtils;
 import utils.Utils;
@@ -59,6 +60,9 @@ public class SpritesheetImporter extends JDialog {
     //needed to calculate drag distance
     private Point lastMousePos;
     
+    //used to get the translated strings for the tool sprite sheet
+    private LocalizationManager loc;
+    
     private List<Rectangle> importedAreas = new ArrayList<>();
     
     public static final Color COLOR_SELECTION_BORDER = new Color(255, 215, 0);
@@ -68,6 +72,8 @@ public class SpritesheetImporter extends JDialog {
         super(parent, "Spritesheet Slicer", true);
         this.tileSize = tileSize;
         this.tileEditor = tileEditor;
+        
+		loc = LocalizationManager.getInstance();
         
         try {
             sheet = ImageIO.read(sheetFile);
@@ -298,7 +304,7 @@ public class SpritesheetImporter extends JDialog {
     private boolean chooseDestination() {
     	//start in project root
         JFileChooser chooser = new JFileChooser(new File("."));
-        chooser.setDialogTitle("Select Destination Folder");
+        chooser.setDialogTitle(loc.getString("dialog_destination_folder"));
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         
         int result = chooser.showOpenDialog(this.getParent()); 
@@ -316,9 +322,9 @@ public class SpritesheetImporter extends JDialog {
 
         //passing this ensures it pops up in the middle of the importer window
         String input = (String) JOptionPane.showInputDialog(
-                this, 
-                "Enter name for the new texture:", 
-                "Exporting to " + destinationFolder.getName(), 
+                this,
+                loc.getString("dialog_export_spritesheet_texture_name"), 
+                loc.getString("dialog_export") + destinationFolder.getName(), 
                 JOptionPane.PLAIN_MESSAGE, 
                 null, 
                 null, 
@@ -344,7 +350,7 @@ public class SpritesheetImporter extends JDialog {
             importedAreas.add(new Rectangle(selection));
             resetSelection();
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Save failed: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, loc.getString("dialog_save_failed") + ex.getMessage());
         }
     }
 

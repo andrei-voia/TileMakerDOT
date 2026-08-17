@@ -8,6 +8,7 @@ import data.CanvasViewState;
 import data.MapDirection;
 import data.MapState;
 import io.KeyController;
+import localization.LocalizationManager;
 import view.Camera;
 import view.CanvasRenderer;
 
@@ -32,10 +33,12 @@ public class ExtendMapTool {
 	
 	//logic for extending and shrinking the map
 	public void extendOrShrinkMap(MapDirection direction, int delta) {
+		LocalizationManager loc = LocalizationManager.getInstance();
+		
 		if(delta == 0) {
 			JOptionPane.showMessageDialog(null,
-					"Error: Cannot change map size by " + delta + ". There is nothing to change.",
-					"Extending Error", JOptionPane.ERROR_MESSAGE);
+					loc.getFormattedString("dialog_extend_error_change", delta),
+					loc.getString("dialog_extend_error"), JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 		
@@ -55,9 +58,8 @@ public class ExtendMapTool {
 
 		if (newRows <= 0 || newCols <= 0) {
 			JOptionPane.showMessageDialog(null,
-					"Error: Cannot change map size by " + delta + ". New size would be invalid: (" + newRows + " x "
-							+ newCols + "). Size must be greater than 0.",
-					"Extending Error", JOptionPane.ERROR_MESSAGE);
+					loc.getFormattedString("dialog_extend_invalid", delta, newRows, newCols),
+					loc.getString("dialog_extend_error"), JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
@@ -129,8 +131,10 @@ public class ExtendMapTool {
 		}
 		mapState.refreshAllObjectsList();
 		historyFunction.resetSaveState();
-		keyController.keyRelease();
-
+		if(keyController != null) {
+			keyController.keyRelease();
+		}
+		
 		canvasRenderer.repaint();
 	}
 }

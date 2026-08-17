@@ -17,6 +17,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import core.TabData;
+import localization.LocalizationManager;
 import main.AssetPalette;
 import main.EditorMenuBar;
 
@@ -90,7 +91,7 @@ public class SearchFieldFunction {
         });
         
         //create the label
-        searchLabel = new JLabel("Filter: ");
+        searchLabel = new JLabel(LocalizationManager.getInstance().getString("menu_filter"));
         searchLabel.setBorder(new EmptyBorder(0, 5, 0, 5));
     }
     
