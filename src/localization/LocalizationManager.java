@@ -31,7 +31,8 @@ public final class LocalizationManager {
 		new Locale("fr"),
 		new Locale("ro"),
 		new Locale("ru"),
-		new Locale("uk")
+		new Locale("uk"),
+		new Locale("it")
 	};
 	
 	private LocalizationManager() {
