@@ -224,15 +224,15 @@ public class MapLoader {
 		}
 	}
 
-	//Helper method to read a single layer (tileMap, objectMap, or npcMap) from the BufferedReader
+	//helper method to read a single layer (tileMap, objectMap, or npcMap) from the BufferedReader
 	private void readLayer(BufferedReader br, int[][] mapArray, int rows, int cols, String expectedHeader)
 			throws IOException {
 		String line = br.readLine();
 		
-		StringBuilder errorMessage = new StringBuilder("The following IDs in '" + expectedHeader + "' were not found and will be ignored:\n");
+		StringBuilder errorMessage = new StringBuilder(loc.getFormattedString("dialog_ids_not_found", expectedHeader));
 		Set<Integer> missingIDs = new HashSet<>();
 		
-		//skip comment lines (like the header)
+		//skip comment lines like the header
 		while (line != null && line.startsWith("#")) {
 			line = br.readLine();
 		}

@@ -84,7 +84,13 @@ public class ApplicationLegend {
             <li><b>Place NPC Walk Area</b> → Set a boundary where NPCs can walk</li>
         	             Note: [Shift + Left Mouse + Drag → place, ALT + Left Mouse + Draw → remove]
             <li><b>Locate Item</b> → Shows only the currently selected Tile, Object, or NPC on the map</li>
-            <li><b>Scene Items Count</b> → Shows the total number of Tiles, Objects, and NPCs added on the map</li>
+            <li><b>Asset Statistics Dashboard</b> → Opens a comprehensive performance and design overview pane:
+        		<ul>
+        		<li><b>Composition Summary:</b> Displays the grand totals and unique type counts for all placed Tiles, Objects, and NPCs.</li>
+        		<li><b>Density Breakdown:</b> Features dedicated tabs sorting individual Objects, NPCs and Tiles by density to help identify potential performance bottlenecks.</li>
+        		<li><b>Live Filtering:</b> Includes a built-in search bar to filter assets instantly by name across all tracking categories.</li>
+        		</ul>
+        	</li>
             <li><b>Toggle Dark Mode</b> → Switches the entire UI between Light and Dark themes for better visibility in different environments</li>
             </ul>
             

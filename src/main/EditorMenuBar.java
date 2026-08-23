@@ -36,6 +36,8 @@ import tools.SpritesheetImporter;
 import utils.ApplicationLegend;
 import utils.ImageUtils;
 import utils.Utils;
+import view.MapStatistics;
+import view.StatisticsDashboardDialog;
 import view.TileCanvas;
 
 public class EditorMenuBar {
@@ -53,6 +55,8 @@ public class EditorMenuBar {
     private JMenuItem quickSaveItem;
     private JMenuBar menuBar = new JMenuBar();
     
+    private MapStatistics mapStatistics;
+    
     private Set<Integer> brushIds = new HashSet<>();
     private int brushSpread = 5;
     
@@ -64,6 +68,8 @@ public class EditorMenuBar {
     	
     	this.readInputs = readInputs;
     	this.resourceBasePath = resourceBasePath;
+    	
+    	mapStatistics = new MapStatistics(canvas.getMapState().getRegistry());
     }
     
     //creates and returns the application JMenuBar and organizing existing functions
@@ -472,10 +478,10 @@ public class EditorMenuBar {
         	}
         });
         
-        JMenuItem objectsCount = new JMenuItem(loc.getString("menu_scene_count"));
-        objectsCount.setToolTipText(loc.getString("menu_scene_count_tooltip"));
+        JMenuItem objectsCount = new JMenuItem(loc.getString("menu_statistics_dashboard"));
+        objectsCount.setToolTipText(loc.getString("menu_statistics_dashboard_tooltip"));
         objectsCount.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_J, 0));
-        objectsCount.addActionListener(e -> showObjectsCount(frame));
+        objectsCount.addActionListener(e -> showStatisticsDashboard(frame));
         
         JMenuItem npcWalkArea = new JMenuItem(loc.getString("menu_npc_walk_area"));
         npcWalkArea.setToolTipText(loc.getString("menu_npc_walk_area_tooltip"));
@@ -893,18 +899,12 @@ public class EditorMenuBar {
 	    return item;
 	}
 	
-	private void showObjectsCount(JFrame frame) {
-		LocalizationManager loc = LocalizationManager.getInstance();
-		String message = getCountAllTiles();
-		JOptionPane.showMessageDialog(frame, message, loc.getString("scene_count_title"), JOptionPane.INFORMATION_MESSAGE);
-	}
-	
-	public String getCountAllTiles() {
-		LocalizationManager loc = LocalizationManager.getInstance();
-		String text = loc.getFormattedString("scene_count_tiles", Utils.countValidObjects(canvas.getMapState().getData().getTileMap()));
-		text += "\n" + loc.getFormattedString("scene_count_objects", Utils.countValidObjects(canvas.getMapState().getData().getObjectMap()));
-		text += "\n" + loc.getFormattedString("scene_count_npcs", Utils.countValidObjects(canvas.getMapState().getData().getNpcMap(), new int[]{1}));
-		return text;
+	private void showStatisticsDashboard(JFrame frame) {
+		//initialize the dashboard window
+		StatisticsDashboardDialog dashboard = new StatisticsDashboardDialog(frame, mapStatistics, canvas.getMapState());
+		
+		//make the dashboard visible and it blocks the main editor until closed
+	    dashboard.setVisible(true);
 	}
 	
 	private void performAutoIDAssignment(JFrame frame) {

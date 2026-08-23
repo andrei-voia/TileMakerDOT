@@ -2,7 +2,7 @@ package core;
 
 import java.awt.image.BufferedImage;
 
-public class TileObject extends Tile{
+public class TileObject extends Tile {
 
 	private int x;
 	private int y;

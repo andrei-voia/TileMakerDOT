@@ -29,10 +29,10 @@ public final class LocalizationManager {
 		Locale.ENGLISH,
 		new Locale("es"),
 		new Locale("fr"),
+		new Locale("it"),
 		new Locale("ro"),
 		new Locale("ru"),
-		new Locale("uk"),
-		new Locale("it")
+		new Locale("uk")
 	};
 	
 	private LocalizationManager() {
