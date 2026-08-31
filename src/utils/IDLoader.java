@@ -23,11 +23,11 @@ public class IDLoader {
         npcIds.clear();
 
         //REGEX explanation
-        // \d+\.         -> matches the line number (e.g. "1.")
-        // \s+           -> matches spaces
-        // (\d+)         -> group 1: Captures the ID number
-        // \s+\(Name:\s+ -> matches the " (Name: " part
-        // ([^)]+)       -> group 2: Captures everything until the closing ")"
+        //\d+\.         -> matches the line number (e.g. "1.")
+        //\s+           -> matches spaces
+        //(\d+)         -> group 1: Captures the ID number
+        //\s+\(Name:\s+ -> matches the " (Name: " part
+        //([^)]+)       -> group 2: Captures everything until the closing ")"
         Pattern pattern = Pattern.compile("\\d+\\.\\s+(\\d+)\\s+\\(Name:\\s+([^)]+)\\)");
 
         //track which section we are currently reading

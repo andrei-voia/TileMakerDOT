@@ -4,9 +4,6 @@ import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Toolkit;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -26,16 +23,17 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
-import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import data.MapDirection;
+import io.KeybindManager;
 import localization.LocalizationManager;
 import tools.SpritesheetImporter;
 import utils.ApplicationLegend;
 import utils.ImageUtils;
 import utils.Utils;
+import view.KeybindSettingsDialog;
 import view.MapStatistics;
 import view.StatisticsDashboardDialog;
 import view.TileCanvas;
@@ -60,6 +58,9 @@ public class EditorMenuBar {
     private Set<Integer> brushIds = new HashSet<>();
     private int brushSpread = 5;
     
+    //used to load and use saved shortcut buttons
+    private KeybindManager keybind = KeybindManager.getInstance();
+    
     public EditorMenuBar(TileEditor tileEditor, TileCanvas canvas, ApplicationLegend applicationLegend, 
     		String[] readInputs, String resourceBasePath) {
     	this.tileEditor = tileEditor;
@@ -79,7 +80,7 @@ public class EditorMenuBar {
         JMenu fileMenu = new JMenu(loc.getString("file_menu"));
         
         JMenuItem loadItem = new JMenuItem(loc.getString("menu_load_map"));
-        loadItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+        loadItem.setAccelerator(keybind.getKeyStroke("action.load_map"));
         loadItem.addActionListener(e -> {
             JFileChooser chooser = new JFileChooser();
             
@@ -102,10 +103,7 @@ public class EditorMenuBar {
         });
         
         JMenuItem saveItem = new JMenuItem(loc.getString("menu_save_as"));
-        saveItem.setAccelerator(KeyStroke.getKeyStroke(
-        	    KeyEvent.VK_S,
-        	    Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx() | InputEvent.SHIFT_DOWN_MASK
-        	));
+        saveItem.setAccelerator(keybind.getKeyStroke("action.save_as"));
         saveItem.addActionListener(e -> {
             JFileChooser chooser = new JFileChooser();
             //set the current file loading location if already saved once
@@ -120,7 +118,7 @@ public class EditorMenuBar {
         });
         
         quickSaveItem = new JMenuItem(loc.getString("menu_quick_save"));
-        quickSaveItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+        quickSaveItem.setAccelerator(keybind.getKeyStroke("action.quick_save"));
         quickSaveItem.addActionListener(e -> {
         	canvas.getMapExporter().saveMap(canvas.getMapState().getCacheData().getCachedSavedLocation(), false);
         	canvas.getMapState().getCacheData().setCanQuickSave(false);
@@ -130,7 +128,7 @@ public class EditorMenuBar {
         
         JMenuItem saveChunkSelection = new JMenuItem(loc.getString("menu_export_chunk"));
         saveChunkSelection.setToolTipText(loc.getString("menu_export_chunk_tooltip"));
-        saveChunkSelection.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+        saveChunkSelection.setAccelerator(keybind.getKeyStroke("action.export_chunk"));
         saveChunkSelection.addActionListener(e -> {
             JFileChooser chooser = new JFileChooser();
             if (chooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
@@ -140,7 +138,7 @@ public class EditorMenuBar {
         
         JMenuItem importChunkSelection = new JMenuItem(loc.getString("menu_import_chunk"));
         importChunkSelection.setToolTipText(loc.getString("menu_import_chunk_tooltip"));
-        importChunkSelection.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+        importChunkSelection.setAccelerator(keybind.getKeyStroke("action.import_chunk"));
         importChunkSelection.addActionListener(e -> {
             JFileChooser chooser = new JFileChooser();
             
@@ -151,13 +149,13 @@ public class EditorMenuBar {
             chooser.setFileFilter(filter);
             chooser.setAcceptAllFileFilterUsed(false);
             
-            if (chooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
+            if (chooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
             	canvas.getMapLoader().loadChunk(chooser.getSelectedFile());
             }
         });
         
         JMenuItem exportLvlFormat = new JMenuItem(loc.getString("menu_export_lvl"));
-        exportLvlFormat.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+        exportLvlFormat.setAccelerator(keybind.getKeyStroke("action.export_lvl"));
         exportLvlFormat.addActionListener(e -> {
             JFileChooser chooser = new JFileChooser();
             if (chooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
@@ -167,7 +165,7 @@ public class EditorMenuBar {
         
         JMenuItem exportCsvFormat = new JMenuItem(loc.getString("menu_export_csv"));
         exportCsvFormat.setToolTipText(loc.getString("menu_export_csv_tooltip"));
-        exportCsvFormat.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+        exportCsvFormat.setAccelerator(keybind.getKeyStroke("action.export_csv"));
         exportCsvFormat.addActionListener(e -> {
             JFileChooser chooser = new JFileChooser();
             if (chooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
@@ -177,7 +175,7 @@ public class EditorMenuBar {
         
         JMenuItem exportTmxFormat = new JMenuItem(loc.getString("menu_export_tmx"));
         exportTmxFormat.setToolTipText(loc.getString("menu_export_tmx_tooltip"));
-        exportTmxFormat.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+        exportTmxFormat.setAccelerator(keybind.getKeyStroke("action.export_tmx"));
         exportTmxFormat.addActionListener(e -> {
             JFileChooser chooser = new JFileChooser();
             if (chooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
@@ -187,7 +185,7 @@ public class EditorMenuBar {
         
         JMenuItem exportJsonFormat = new JMenuItem(loc.getString("menu_export_json"));
         exportJsonFormat.setToolTipText(loc.getString("menu_export_json_tooltip"));
-        exportJsonFormat.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_J, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+        exportJsonFormat.setAccelerator(keybind.getKeyStroke("action.export_json"));
         exportJsonFormat.addActionListener(e -> {
             JFileChooser chooser = new JFileChooser();
             if (chooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
@@ -197,7 +195,7 @@ public class EditorMenuBar {
         
         JMenuItem exportItem = new JMenuItem(loc.getString("menu_export_png"));
         exportItem.setToolTipText(loc.getString("menu_export_png_tooltip"));
-        exportItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+        exportItem.setAccelerator(keybind.getKeyStroke("action.export_png"));
         exportItem.addActionListener(e -> {
             JFileChooser chooser = new JFileChooser();
             if (chooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
@@ -207,7 +205,7 @@ public class EditorMenuBar {
         
         JMenuItem exportIds = new JMenuItem(loc.getString("menu_export_ids"));
         exportIds.setToolTipText(loc.getString("menu_export_ids_tooltip"));
-        exportIds.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_U, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+        exportIds.setAccelerator(keybind.getKeyStroke("action.export_ids"));
         exportIds.addActionListener(e -> {
             JFileChooser chooser = new JFileChooser();
             if (chooser.showSaveDialog(frame) == JFileChooser.APPROVE_OPTION) {
@@ -217,9 +215,8 @@ public class EditorMenuBar {
         
         JMenuItem spriteSheetImport = new JMenuItem(loc.getString("menu_import_spritesheet"));
         spriteSheetImport.setToolTipText(loc.getString("menu_import_spritesheet_tooltip"));
-        spriteSheetImport.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()));
+        spriteSheetImport.setAccelerator(keybind.getKeyStroke("action.import_spritesheet"));
         spriteSheetImport.addActionListener(e -> {
-        	
         	//show the sprite sheet input tile size and texture selection
         	createSpritesheetWindow(frame);
         });
@@ -245,12 +242,12 @@ public class EditorMenuBar {
         
         JMenuItem refreshAssetsItem = new JMenuItem(loc.getString("menu_refresh_assets"));
         refreshAssetsItem.setToolTipText(loc.getString("menu_refresh_assets_tooltip"));
-        refreshAssetsItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F5, 0));
+        refreshAssetsItem.setAccelerator(keybind.getKeyStroke("action.refresh_assets"));
         refreshAssetsItem.addActionListener(e -> refreshAssets(frame));
         
         JMenuItem undoItem = new JMenuItem(loc.getString("menu_undo"));
         undoItem.setToolTipText(loc.getString("menu_undo_tooltip"));
-        undoItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK));
+        undoItem.setAccelerator(keybind.getKeyStroke("action.undo"));
         undoItem.addActionListener(e -> {
         	canvas.getHistoryFunction().undo();
         	tileEditor.getStatusInfoBar().updateStatusUI();
@@ -258,7 +255,7 @@ public class EditorMenuBar {
         
         JMenuItem redoItem = new JMenuItem(loc.getString("menu_redo"));
         redoItem.setToolTipText(loc.getString("menu_redo_tooltip"));
-        redoItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK));
+        redoItem.setAccelerator(keybind.getKeyStroke("action.redo"));
         redoItem.addActionListener(e -> {
             canvas.getHistoryFunction().redo();
             tileEditor.getStatusInfoBar().updateStatusUI();
@@ -266,7 +263,7 @@ public class EditorMenuBar {
 
         JMenuItem fillItem = new JMenuItem(loc.getString("menu_fill_map"));
         fillItem.setToolTipText(loc.getString("menu_fill_map_tooltip"));
-        fillItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.CTRL_DOWN_MASK));
+        fillItem.setAccelerator(keybind.getKeyStroke("action.fill_map"));
         fillItem.addActionListener(e -> {
             if (canvas.getSelected().isTileMode()) {
                 canvas.fillMapWithTile(canvas.getSelected().getIndex());
@@ -278,7 +275,7 @@ public class EditorMenuBar {
         
         JMenuItem fillEmptyItem = new JMenuItem(loc.getString("menu_fill_empty"));
         fillEmptyItem.setToolTipText(loc.getString("menu_fill_empty_tooltip"));
-        fillEmptyItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK));
+        fillEmptyItem.setAccelerator(keybind.getKeyStroke("action.fill_empty"));
         fillEmptyItem.addActionListener(e -> {
             if (canvas.getSelected().isTileMode()) {
                 canvas.fillEmptyTilesWithSelected();
@@ -296,7 +293,7 @@ public class EditorMenuBar {
          frame, 
          loc.getString("menu_extend_up"), 
          loc.getString("menu_extend_map_up"), 
-         KeyEvent.VK_UP, 
+         "action.extend_up", 
          MapDirection.UP
      );
 
@@ -304,7 +301,7 @@ public class EditorMenuBar {
          frame, 
          loc.getString("menu_extend_down"), 
          loc.getString("menu_extend_map_down"), 
-         KeyEvent.VK_DOWN, 
+         "action.extend_down", 
          MapDirection.DOWN
      );
 
@@ -312,7 +309,7 @@ public class EditorMenuBar {
          frame, 
          loc.getString("menu_extend_right"), 
          loc.getString("menu_extend_map_right"), 
-         KeyEvent.VK_RIGHT, 
+         "action.extend_right", 
          MapDirection.RIGHT
      );
 
@@ -320,7 +317,7 @@ public class EditorMenuBar {
          frame, 
          loc.getString("menu_extend_left"), 
          loc.getString("menu_extend_map_left"), 
-         KeyEvent.VK_LEFT, 
+         "action.extend_left", 
          MapDirection.LEFT
      );
         
@@ -331,7 +328,7 @@ public class EditorMenuBar {
         extendMapMenu.add(extendMapRight);
         
         JMenuItem autoIdItem = new JMenuItem(loc.getString("menu_auto_assign_ids"));
-        autoIdItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, 0));
+        autoIdItem.setAccelerator(keybind.getKeyStroke("action.auto_assign_ids"));
         autoIdItem.setToolTipText(loc.getString("menu_auto_assign_ids_tooltip"));
         autoIdItem.addActionListener(e -> {
             int confirm = JOptionPane.showConfirmDialog(frame, 
@@ -358,7 +355,7 @@ public class EditorMenuBar {
         JMenu toolsMenu = new JMenu(loc.getString("tools_menu"));
         
         JMenuItem cleanupItem = new JMenuItem(loc.getString("menu_cleanup_assets"));
-        cleanupItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, 0)); 
+        cleanupItem.setAccelerator(keybind.getKeyStroke("action.cleanup_assets"));
         cleanupItem.setToolTipText(loc.getString("menu_cleanup_assets_tooltip"));
         cleanupItem.addActionListener(e -> {
             //confirmation dialog before proceeding
@@ -374,7 +371,7 @@ public class EditorMenuBar {
         
         JMenuItem scatterBrushItem = new JMenuItem(loc.getString("menu_scatter_brush"));
         scatterBrushItem.setToolTipText(loc.getString("menu_scatter_brush_tooltip"));
-        scatterBrushItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B, 0)); 
+        scatterBrushItem.setAccelerator(keybind.getKeyStroke("action.scatter_brush"));
         scatterBrushItem.addActionListener(e -> {
         	if (this.getBrushIds().isEmpty()) {
                 JOptionPane.showMessageDialog(frame, loc.getString("menu_scatter_brush_empty"));
@@ -419,7 +416,7 @@ public class EditorMenuBar {
         //clean the brush selections
         JMenuItem cleanBrushItem = new JMenuItem(loc.getString("menu_clean_brush"));
         cleanBrushItem.setToolTipText(loc.getString("menu_clean_brush_tooltip"));
-        cleanBrushItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, 0)); 
+        cleanBrushItem.setAccelerator(keybind.getKeyStroke("action.clean_brush"));
         cleanBrushItem.addActionListener(e -> {
         	this.getBrushIds().clear();
         	tileEditor.getStatusInfoBar().updateStatusUI();
@@ -429,7 +426,7 @@ public class EditorMenuBar {
         
         JMenuItem chunkSelectionItem = new JMenuItem(loc.getString("menu_chunk_selection"));
         chunkSelectionItem.setToolTipText(loc.getString("menu_chunk_selection_tooltip"));
-        chunkSelectionItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0)); 
+        chunkSelectionItem.setAccelerator(keybind.getKeyStroke("action.chunk_selection"));
         chunkSelectionItem.addActionListener(e -> {
         	canvas.toggleChunkSelectionMode();
         	if(canvas.getSelected().isChunkSelectionTool()) {
@@ -442,7 +439,7 @@ public class EditorMenuBar {
         
         JMenuItem notesToolItem = new JMenuItem(loc.getString("menu_notes_tool"));
         notesToolItem.setToolTipText(loc.getString("menu_notes_tool_tooltip"));
-        notesToolItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
+        notesToolItem.setAccelerator(keybind.getKeyStroke("action.notes_tool"));
         notesToolItem.addActionListener(e -> {
         	canvas.setNotesTool();
         	if(canvas.getSelected().isNotesTool()) {
@@ -467,7 +464,7 @@ public class EditorMenuBar {
         
         JMenuItem eraseObjectItem = new JMenuItem(loc.getString("menu_erase_mode"));
         eraseObjectItem.setToolTipText(loc.getString("menu_erase_mode_tooltip"));
-        eraseObjectItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, 0)); 
+        eraseObjectItem.setAccelerator(keybind.getKeyStroke("action.erase_mode"));
         eraseObjectItem.addActionListener(e -> {
         	canvas.setSelectedEraseMode();
         	if(canvas.getSelected().isEraseMode()) {
@@ -480,12 +477,12 @@ public class EditorMenuBar {
         
         JMenuItem objectsCount = new JMenuItem(loc.getString("menu_statistics_dashboard"));
         objectsCount.setToolTipText(loc.getString("menu_statistics_dashboard_tooltip"));
-        objectsCount.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_J, 0));
+        objectsCount.setAccelerator(keybind.getKeyStroke("action.statistics_dashboard"));
         objectsCount.addActionListener(e -> showStatisticsDashboard(frame));
         
         JMenuItem npcWalkArea = new JMenuItem(loc.getString("menu_npc_walk_area"));
         npcWalkArea.setToolTipText(loc.getString("menu_npc_walk_area_tooltip"));
-        npcWalkArea.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, 0));
+        npcWalkArea.setAccelerator(keybind.getKeyStroke("action.npc_walk_area"));
         npcWalkArea.addActionListener(e -> {
         	canvas.togglePlaceNpcWalkArea();
         	if(canvas.getSelected().isNpcWalkAreaMode()) {
@@ -497,7 +494,7 @@ public class EditorMenuBar {
         });
 
         JMenuItem toggleDarkMode = new JMenuItem(loc.getString("menu_toggle_dark_mode"));
-        toggleDarkMode.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_K, 0));
+        toggleDarkMode.setAccelerator(keybind.getKeyStroke("action.toggle_dark_mode"));
         toggleDarkMode.addActionListener(e -> {
         	if(tileEditor.getLoadedSetup().getDarkMode() == 1) {
         		tileEditor.getLoadedSetup().toggleDarkMode(false);
@@ -516,7 +513,7 @@ public class EditorMenuBar {
         
         JMenuItem toggleLocateMode = new JMenuItem(loc.getString("menu_locate_item"));
         toggleLocateMode.setToolTipText(loc.getString("menu_locate_item_tooltip"));
-        toggleLocateMode.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, 0));
+        toggleLocateMode.setAccelerator(keybind.getKeyStroke("action.locate_item"));
         toggleLocateMode.addActionListener(e -> {
         	canvas.getCanvasViewState().toggleLocateMode();
         	canvas.getCanvasRenderer().repaint();
@@ -541,7 +538,7 @@ public class EditorMenuBar {
         
         JMenuItem toggleNightMode = new JMenuItem(loc.getString("menu_night_mode"));
         toggleNightMode.setToolTipText(loc.getString("menu_night_mode_tooltip"));
-        toggleNightMode.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, 0));
+        toggleNightMode.setAccelerator(keybind.getKeyStroke("action.night_mode"));
         toggleNightMode.addActionListener(e -> {
         	canvas.getCanvasViewState().toggleNightMode();
         	canvas.getCanvasRenderer().repaint();
@@ -555,7 +552,7 @@ public class EditorMenuBar {
         
         JMenuItem toggleNotesMap = new JMenuItem(loc.getString("menu_toggle_notes"));
         toggleNotesMap.setToolTipText(loc.getString("menu_toggle_notes_tooltip"));
-        toggleNotesMap.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_DOWN_MASK));
+        toggleNotesMap.setAccelerator(keybind.getKeyStroke("action.toggle_notes"));
         toggleNotesMap.addActionListener(e -> {
         	canvas.getCanvasViewState().toggleNotesTool();
         	canvas.getCanvasRenderer().repaint();
@@ -569,7 +566,7 @@ public class EditorMenuBar {
         
         JMenuItem toggleGridItem = new JMenuItem(loc.getString("menu_toggle_grid"));
         toggleGridItem.setToolTipText(loc.getString("menu_toggle_grid_tooltip"));
-        toggleGridItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G, 0));
+        toggleGridItem.setAccelerator(keybind.getKeyStroke("action.toggle_grid"));
         toggleGridItem.addActionListener(e -> {
         	canvas.getCanvasViewState().toggleGrid();
         	canvas.getCanvasRenderer().repaint();
@@ -583,7 +580,7 @@ public class EditorMenuBar {
         
         JMenuItem toggleTilePosition = new JMenuItem(loc.getString("menu_toggle_cursor"));
         toggleTilePosition.setToolTipText(loc.getString("menu_toggle_cursor_tooltip"));
-        toggleTilePosition.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, 0));
+        toggleTilePosition.setAccelerator(keybind.getKeyStroke("action.toggle_cursor"));
         toggleTilePosition.addActionListener(e -> {
         	canvas.getCanvasViewState().toggleTilePosition();
         	if(canvas.getCanvasViewState().isShowTilePosition()) {
@@ -596,7 +593,7 @@ public class EditorMenuBar {
         
         JMenuItem toggleObjectPlacerPreview = new JMenuItem(loc.getString("menu_toggle_placement"));
         toggleObjectPlacerPreview.setToolTipText(loc.getString("menu_toggle_placement_tooltip"));
-        toggleObjectPlacerPreview.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_P, 0));
+        toggleObjectPlacerPreview.setAccelerator(keybind.getKeyStroke("action.toggle_placement"));
         toggleObjectPlacerPreview.addActionListener(e -> {
         	canvas.getCanvasViewState().toggleObjectPreview();
         	canvas.getCanvasRenderer().repaint();
@@ -610,7 +607,7 @@ public class EditorMenuBar {
         
         JMenuItem toggleTileMap = new JMenuItem(loc.getString("menu_toggle_tile_map"));
         toggleTileMap.setToolTipText(loc.getString("menu_toggle_tile_map_tooltip"));
-        toggleTileMap.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, 0));
+        toggleTileMap.setAccelerator(keybind.getKeyStroke("action.toggle_tile_map"));
         toggleTileMap.addActionListener(e -> {
         	canvas.getCanvasViewState().toggleTileMap();
         	canvas.getCanvasRenderer().repaint();
@@ -624,7 +621,7 @@ public class EditorMenuBar {
         
         JMenuItem toggleObjectMap = new JMenuItem(loc.getString("menu_toggle_object_map"));
         toggleObjectMap.setToolTipText(loc.getString("menu_toggle_object_map_tooltip"));
-        toggleObjectMap.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, 0));
+        toggleObjectMap.setAccelerator(keybind.getKeyStroke("action.toggle_object_map"));
         toggleObjectMap.addActionListener(e -> {
         	canvas.getCanvasViewState().toggleObjectMap();
         	canvas.getCanvasRenderer().repaint();
@@ -638,7 +635,7 @@ public class EditorMenuBar {
         
         JMenuItem toggleNpcMap = new JMenuItem(loc.getString("menu_toggle_npc_map"));
         toggleNpcMap.setToolTipText(loc.getString("menu_toggle_npc_map_tooltip"));
-        toggleNpcMap.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, 0));
+        toggleNpcMap.setAccelerator(keybind.getKeyStroke("action.toggle_npc_map"));
         toggleNpcMap.addActionListener(e -> {
         	canvas.getCanvasViewState().toggleNpcMap();
         	canvas.getCanvasRenderer().repaint();
@@ -652,7 +649,7 @@ public class EditorMenuBar {
         
         JMenuItem toggleAutotile = new JMenuItem(loc.getString("menu_toggle_autotile"));
         toggleAutotile.setToolTipText(loc.getString("menu_toggle_autotile_tooltip"));
-        toggleAutotile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A, 0));
+        toggleAutotile.setAccelerator(keybind.getKeyStroke("action.toggle_autotile"));
         toggleAutotile.addActionListener(e -> {
         	canvas.getCanvasViewState().toggleAutotile();
         	if(canvas.getCanvasViewState().isShowAutotile()) {
@@ -681,7 +678,7 @@ public class EditorMenuBar {
         JMenu helpMenu = new JMenu(loc.getString("help_menu"));
         
         JMenuItem legendItem = new JMenuItem(loc.getString("menu_legend"));
-        legendItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H, 0));
+        legendItem.setAccelerator(keybind.getKeyStroke("action.legend"));
         legendItem.addActionListener(e -> {
             if (!tileEditor.getSearchFieldFunction().getSearchField().hasFocus()) {
             	applicationLegend.showLegend(frame);
@@ -785,6 +782,69 @@ public class EditorMenuBar {
 			applicationLegend.showAbout(frame);
 		});
 		helpMenu.add(aboutItem);
+		
+        //update the keyboard shortcuts here at the end so we can refresh selection after modification
+		JMenuItem keybindSettingsItem = new JMenuItem(loc.getString("menu_keybind_settings"));
+		keybindSettingsItem.setToolTipText(loc.getString("menu_keybind_settings_tooltip"));
+		keybindSettingsItem.setAccelerator(keybind.getKeyStroke("action.keybind_settings"));
+        keybindSettingsItem.addActionListener(e -> {
+            KeybindSettingsDialog dialog = new KeybindSettingsDialog(frame, () -> {
+            	
+            	//instantly update shortcuts without restart when saving this key bind dialog
+                loadItem.setAccelerator(keybind.getKeyStroke("action.load_map"));
+                saveItem.setAccelerator(keybind.getKeyStroke("action.save_as"));
+                quickSaveItem.setAccelerator(keybind.getKeyStroke("action.quick_save"));
+                saveChunkSelection.setAccelerator(keybind.getKeyStroke("action.export_chunk"));
+                importChunkSelection.setAccelerator(keybind.getKeyStroke("action.import_chunk"));
+                exportLvlFormat.setAccelerator(keybind.getKeyStroke("action.export_lvl"));
+                exportCsvFormat.setAccelerator(keybind.getKeyStroke("action.export_csv"));
+                exportTmxFormat.setAccelerator(keybind.getKeyStroke("action.export_tmx"));
+                exportJsonFormat.setAccelerator(keybind.getKeyStroke("action.export_json"));
+                exportItem.setAccelerator(keybind.getKeyStroke("action.export_png"));
+                exportIds.setAccelerator(keybind.getKeyStroke("action.export_ids"));
+                spriteSheetImport.setAccelerator(keybind.getKeyStroke("action.import_spritesheet"));
+
+                refreshAssetsItem.setAccelerator(keybind.getKeyStroke("action.refresh_assets"));
+                undoItem.setAccelerator(keybind.getKeyStroke("action.undo"));
+                redoItem.setAccelerator(keybind.getKeyStroke("action.redo"));
+                fillItem.setAccelerator(keybind.getKeyStroke("action.fill_map"));
+                fillEmptyItem.setAccelerator(keybind.getKeyStroke("action.fill_empty"));
+                extendMapUp.setAccelerator(keybind.getKeyStroke("action.extend_up"));
+                extendMapDown.setAccelerator(keybind.getKeyStroke("action.extend_down"));
+                extendMapLeft.setAccelerator(keybind.getKeyStroke("action.extend_left"));
+                extendMapRight.setAccelerator(keybind.getKeyStroke("action.extend_right"));
+                autoIdItem.setAccelerator(keybind.getKeyStroke("action.auto_assign_ids"));
+                keybindSettingsItem.setAccelerator(keybind.getKeyStroke("action.keybind_settings"));
+                
+                cleanupItem.setAccelerator(keybind.getKeyStroke("action.cleanup_assets"));
+                scatterBrushItem.setAccelerator(keybind.getKeyStroke("action.scatter_brush"));
+                cleanBrushItem.setAccelerator(keybind.getKeyStroke("action.clean_brush"));
+                chunkSelectionItem.setAccelerator(keybind.getKeyStroke("action.chunk_selection"));
+                notesToolItem.setAccelerator(keybind.getKeyStroke("action.notes_tool"));
+
+                eraseObjectItem.setAccelerator(keybind.getKeyStroke("action.erase_mode"));
+                objectsCount.setAccelerator(keybind.getKeyStroke("action.statistics_dashboard"));
+                npcWalkArea.setAccelerator(keybind.getKeyStroke("action.npc_walk_area"));
+                toggleDarkMode.setAccelerator(keybind.getKeyStroke("action.toggle_dark_mode"));
+                toggleLocateMode.setAccelerator(keybind.getKeyStroke("action.locate_item"));
+
+                toggleNightMode.setAccelerator(keybind.getKeyStroke("action.night_mode"));
+                toggleNotesMap.setAccelerator(keybind.getKeyStroke("action.toggle_notes"));
+                toggleGridItem.setAccelerator(keybind.getKeyStroke("action.toggle_grid"));
+                toggleTilePosition.setAccelerator(keybind.getKeyStroke("action.toggle_cursor"));
+                toggleObjectPlacerPreview.setAccelerator(keybind.getKeyStroke("action.toggle_placement"));
+                toggleTileMap.setAccelerator(keybind.getKeyStroke("action.toggle_tile_map"));
+                toggleObjectMap.setAccelerator(keybind.getKeyStroke("action.toggle_object_map"));
+                toggleNpcMap.setAccelerator(keybind.getKeyStroke("action.toggle_npc_map"));
+                toggleAutotile.setAccelerator(keybind.getKeyStroke("action.toggle_autotile"));
+
+                legendItem.setAccelerator(keybind.getKeyStroke("action.legend"));
+            });
+            dialog.setVisible(true);
+        });
+        
+        editMenu.addSeparator();
+        editMenu.add(keybindSettingsItem);
 
         return menuBar;
     }
@@ -852,16 +912,11 @@ public class EditorMenuBar {
 	}
 	
 	//create a custom extension menu that can be called for every direction extension
-	private JMenuItem createExtendMenuItem(JFrame frame, String title, String dialogTitle, int keyCode, MapDirection direction) {
+	private JMenuItem createExtendMenuItem(JFrame frame, String title, String dialogTitle, String actionKey, MapDirection direction) {
 		LocalizationManager loc = LocalizationManager.getInstance();
 		
 	    JMenuItem item = new JMenuItem(title);
-	    
-	    item.setAccelerator(KeyStroke.getKeyStroke(
-	        keyCode, 
-	        InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK
-	    ));
-	    
+	    item.setAccelerator(KeybindManager.getInstance().getKeyStroke(actionKey));
 	    item.addActionListener(e -> {
 	        //prompt the user for input
 	        String input = JOptionPane.showInputDialog(

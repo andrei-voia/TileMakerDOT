@@ -35,6 +35,7 @@ TileMaker DOT addresses common limitations found in traditional map editors by o
 | Feature Category         | TileMaker DOT Benefit | Competitive Advantage |
 | ---                      | ---                   | ---                   |
 | **Multi-Platform**       | Native Launchers for Windows/Mac/Linux.                                                     | Runs anywhere without needing a system-wide Java installation. |
+| **Multilingual Support** | Complete interface translations for multiple localized languages.                           | Allows global developers to work seamlessly in their native language. |
 | **Personalization & UI** | **Light and Dark Themes** Optimized for long dev sessions and better visibility in different environments. | Features a modern and professional aesthetic. |
 | **Export Control**       | Universal Compatibility: Supports **CSV, XML, JSON, TMX (Tiled), TMJ, and .LVL** formats.   | Provides granular control over the final file structure and appearance. |
 | **Asset Management**     | Images can be modified and added later without altering the unique ID of existing textures. | Avoids "breaking" existing map data when updating visual assets. |
@@ -50,6 +51,8 @@ TileMaker DOT addresses common limitations found in traditional map editors by o
 | **Asset Filtering**      | Selective ID Loading: Only imports assets defined in a specific whitelist file.             | Prevents workspace clutter and memory overhead by excluding unused or legacy textures without needing to delete files. |
 | **Spritesheet Slicer**   | Import a full sheet and cut it into individual assets without leaving the app.              | Eliminates the need for external image editors and automatically handles file saving and ID assignment in one workflow. |
 | **Annotated Notes**      | Place persistent, color-coded pins directly onto map tiles to leave design memos, boundary and script reminders, or map out level design notes. | Keeps level design ideas, collaboration notes, and scripting instructions attached directly to the map canvas, scaling perfectly during meetings and game development. |
+| **Asset Analytics**      | Live tracking of grand totals, unique item counts, and density breakdowns for tiles, objects, and NPCs. | Helps identify high density areas and optimize map performance before exporting. |
+| **Custom Keybindings**   | Rebind any menu command or tool shortcut directly in the editor.                            | Adapts to custom developer workflows and prevents shortcut conflicts with other software. |
 ***
 
 ***
@@ -162,6 +165,18 @@ Activate the **Annotated Notes Tool** from the `Tools > Annotated Notes Tool` to
 * **Smart Zoom Scaling:** Notes calculate their position dynamically relative to your pan offsets and keep a consistent pixel size so they remain perfectly readable no matter how far you zoom in or out.
 * **Color Customization:** Use the pop-up configuration panel to select custom enum based label colors with automatic UI live previews.
 
+## 📊 Asset Statistics Dashboard
+Access via `Mode > Asset Statistics Dashboard` or shortcut. This pane provides detailed visual analytics on your map's asset distribution:
+* **Grand Totals:** View total placed counts vs. unique item counts across Tiles, Objects, and NPCs.
+* **Density Breakdown:** Tabbed sorting lists that rank items by placement frequency to isolate memory and rendering bottlenecks.
+* **Live Search Filter:** Instantly filter density lists by item name.
+
+## ⌨️ Keybinding Manager
+Access via `Edit > Keybinding Settings`. Customize every application shortcut to fit your personal workflow:
+* **Custom Binding:** Click any action to capture a new key combination.
+* **Unbind Shortcut:** Press **Backspace** or **Delete** during key capture to set a shortcut to `None`.
+* **Restore Defaults:** Reset all keybindings back to factory settings with a single click.
+
 ***
 
 ## ⚙️ Configuration Files
@@ -174,8 +189,11 @@ The **`settings/`** folder contains text files used to modify default applicatio
 | `default_dark_mode.txt`         | Sets the initial theme (0 for Light, 1 for Dark). | `1` (Dark Mode) |
 | `default_frame_ms_duration.txt` | Sets the global animation speed (in milliseconds). | `200` (Lower is faster) |
 | `default_grids.txt`             | Used to add quick-select buttons for common starting map sizes (in tiles). The first size listed is used as the default. | `50x50, 100x100` |
+| `default_keybinds.txt`          | Saves custom keybinding actions and shortcut key assignments. | Auto-updated when saving in Keybinding Settings inside the tool. |
+| `default_language.txt`          | Stores the selected interface language code. | en, ro, es, fr, it, ru, uk |
 | `default_tile_size.txt`         | Sets the pixel size of a single tile. Objects and NPCs will be scaled proportional to this size. | A 128x128px house on a 64px tile map will occupy 2x2 tiles. |
 | `default_used_ids_list.txt`     | Whitelist Filter: A list of specific IDs the application is allowed to load. Useful for large asset folders where you only need a subset of items for a specific map. | Use the **Export Used IDs List** option in the app to automatically generate this file based on your current map. |
+| `factory_keybinds.txt`          | Read-only default keybinding template file. | Used the restore factory key shortcuts when clicking **Restore Defaults**. |
 
 ***
 
@@ -189,6 +207,8 @@ TileMaker DOT features a **Live-Sync Settings System**. While you can manually e
 | `default_dark_mode.txt`         | Menu Toggle                    | ✅ Yes      |
 | `default_frame_ms_duration.txt` | Startup Animation Field        | ✅ Yes      |
 | `default_grids.txt`             | Startup Grid Size Field        | ❌ No       |
+| `default_keybinds.txt`          | Edit > Keybinding Settings     | ✅ Yes      |
+| `default_language.txt`          | Info > Language                | ✅ Yes      |
 | `default_tile_size.txt`         | Startup Tile Size Field        | ✅ Yes      |
 | `default_used_ids_list.txt`     | Manual File Edit Only          | ❌ No       |
 
@@ -224,8 +244,11 @@ TileMaker DOT/
 │       ├── default_dark_mode.txt
 │       ├── default_frame_ms_duration.txt
 │       ├── default_grids.txt
+│       ├── default_keybinds.txt
+│       ├── default_language.txt
 │       ├── default_tile_size.txt
-│       └── default_used_ids_list.txt
+│       ├── default_used_ids_list.txt
+│       └── factory_keybinds.txt
 │
 ├── jdk-16.0.2/                          (Required for Windows)
 ├── jdk-macOS/                           (Required for macOS)

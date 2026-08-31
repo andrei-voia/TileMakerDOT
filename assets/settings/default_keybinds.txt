@@ -1,0 +1,57 @@
+# TileMakerDOT Keybindings Configuration
+
+# File Menu
+action.load_map=ctrl L
+action.quick_save=ctrl S
+action.save_as=ctrl shift S
+action.import_spritesheet=ctrl P
+action.import_chunk=ctrl I
+action.export_chunk=ctrl C
+action.export_tmx=ctrl T
+action.export_lvl=ctrl X
+action.export_csv=ctrl V
+action.export_json=ctrl J
+action.export_ids=ctrl U
+action.export_png=ctrl I
+
+# Edit Menu
+action.undo=ctrl Z
+action.redo=ctrl Y
+action.fill_map=ctrl M
+action.fill_empty=ctrl F
+action.extend_up=ctrl shift UP
+action.extend_down=ctrl shift DOWN
+action.extend_left=ctrl shift LEFT
+action.extend_right=ctrl shift RIGHT
+action.refresh_assets=F5
+action.auto_assign_ids=F4
+action.keybind_settings=ctrl K
+
+# Tools Menu
+action.notes_tool=ctrl N
+action.scatter_brush=B
+action.clean_brush=C
+action.chunk_selection=S
+action.cleanup_assets=V
+
+# Mode Menu
+action.erase_mode=E
+action.npc_walk_area=W
+action.locate_item=L
+action.statistics_dashboard=J
+action.toggle_dark_mode=K
+
+# View Menu
+action.toggle_tile_map=T
+action.toggle_object_map=O
+action.toggle_npc_map=N
+action.toggle_grid=G
+action.toggle_cursor=M
+action.toggle_placement=P
+action.toggle_autotile=A
+action.toggle_notes=alt N
+action.night_mode=Y
+
+# Help Menu
+action.legend=H
+

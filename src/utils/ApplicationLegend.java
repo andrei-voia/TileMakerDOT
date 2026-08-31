@@ -65,6 +65,7 @@ public class ApplicationLegend {
         	             Note: Undo (Ctrl + Z) will not work after extending the map
             <li><b>Refresh Assets</b> → Re-scans the folders and reloads textures</li>
             <li><b>Auto-Assign Missing IDs</b> → Automatically fixes files missing "ID_" prefixes by finding the next available ID</li>
+            <li><b>Keybinding Settings</b> → Configure custom keyboard shortcuts for all editor actions, clear assigned bindings, or restore factory defaults</li>
             </ul>
                         
             <font size='5'><b>🖌️ Tools Menu:</b></font>
@@ -91,6 +92,7 @@ public class ApplicationLegend {
         		<li><b>Live Filtering:</b> Includes a built-in search bar to filter assets instantly by name across all tracking categories.</li>
         		</ul>
         	</li>
+        	<li><b>Asset Statistics Dashboard</b> → View grand totals, unique asset counts, and density breakdowns for Tiles, Objects, and NPCs to analyze map composition and optimize performance</li>
             <li><b>Toggle Dark Mode</b> → Switches the entire UI between Light and Dark themes for better visibility in different environments</li>
             </ul>
             
@@ -107,10 +109,11 @@ public class ApplicationLegend {
             <li><b>Preview Night Mode</b> → Show/hide simulated night time lighting on the map</li>
             </ul>
             
-            <font size='5'><b>📜 Help Menu:</b></font>
+            <font size='5'><b>📜 Info Menu:</b></font>
             <ul>
-            <li><b>Legend</b> → Show this shortcut guide</li>
+            <li><b>Application Legend</b> → Show this shortcut guide</li>
             <li><b>Video Tutorials</b> → Learn how to build maps with the official video series</li>
+            <li><b>Language</b> → Switch the interface language on the fly between all supported localized translations</li>
             <li><b>About</b> → Details about TileMaker DOT</li>
             </ul>
             
