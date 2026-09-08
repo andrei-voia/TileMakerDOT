@@ -148,7 +148,7 @@ public class ApplicationLegend {
 	
 	public void showAbout(JFrame frame) {
 		String aboutMessage = "<html><body style='width: 260px; padding: 10px;'>" +
-			    "<h1 style='color: #58a6ff; margin-bottom: 0;'>TileMaker DOT</h1>" + 
+			    "<h1 style='color: #58a6ff; margin-bottom: 0;'>TileMaker DOT v2.6.4</h1>" + 
 			    "<p style='margin-top: 0;'>Professional Map Engineering Tool</p>" +
 			    "<p>Created by <b>Andrei Voia</b></p>" +
 			    "<br><hr>" +

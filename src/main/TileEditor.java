@@ -232,7 +232,7 @@ public class TileEditor {
         
         assetPalette = new AssetPalette(this, canvas);
         
-        editorMenuBar = new EditorMenuBar(this, canvas, applicationLegend, inputs, loadedSetup.getResourceBasePath());
+        editorMenuBar = new EditorMenuBar(this, canvas, applicationLegend, inputs, loadedSetup);
         
         statusInfoBar = new StatusInfoBar(this, canvas, editorMenuBar);
         

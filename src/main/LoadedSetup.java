@@ -1,5 +1,6 @@
 package main;
 
+import java.awt.Font;
 import java.awt.Toolkit;
 import java.util.List;
 
@@ -25,6 +26,7 @@ public class LoadedSetup {
     private List<String> defaultSizes;
     private long frameDuration = 200; //200ms per frame by default
     private int darkMode = 0;
+    private String savedLanguage;
     
     private TileEditor tileEditor;
     
@@ -43,7 +45,7 @@ public class LoadedSetup {
         tileSizeLoaded = Utils.loadInitialDefaultValues("default_tile_size.txt");
         
         //load saved language preference
-        String savedLanguage = Utils.loadInitialDefaultValues("default_language.txt");
+        savedLanguage = Utils.loadInitialDefaultValues("default_language.txt");
         LocalizationManager.getInstance().loadSavedLocale(savedLanguage);
         
         try {
@@ -75,7 +77,9 @@ public class LoadedSetup {
 		        UIManager.setLookAndFeel(new FlatLightLaf());
 		    }
 		    
-		    //this updates every window and component instantly
+		    //we do this check for Korean language specifically
+		    updateLanguageFont(savedLanguage);
+		    
 		    FlatLaf.updateUI(); 
 
 		    if (tileEditor.getCanvas() != null) {
@@ -85,6 +89,32 @@ public class LoadedSetup {
 		} catch (Exception ex) {
 		    System.err.println("Failed to switch theme: " + ex.getMessage());
 		}
+	}
+	
+	private void updateLanguageFont(String currentLangCode) {
+	    if ("ko".equalsIgnoreCase(currentLangCode)) {
+	        //only set Malgun Gothic when Korean is selected so it can be shown properly
+	        UIManager.put("defaultFont", getUniversalFont(Font.PLAIN, 12));
+	    }
+	}
+	
+	public Font getUniversalFont(int style, int size) {
+	    //check if standard dialog font works
+	    Font testFont = new Font(Font.DIALOG, style, size);
+	    if (testFont.canDisplay('한')) {
+	        return testFont;
+	    }
+
+	    //explicitly test native OS Korean fonts installed
+	    String[] candidateFonts = {"Malgun Gothic", "맑은 고딕"};
+	    for (String fontName : candidateFonts) {
+	        Font font = new Font(fontName, style, size);
+	        if (font.canDisplay('한')) {
+	            return font;
+	        }
+	    }
+
+	    return testFont;
 	}
 
 	public String getResourceBasePath() {

@@ -4,6 +4,7 @@ import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Window;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +14,7 @@ import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -43,6 +45,7 @@ public class EditorMenuBar {
 	private TileEditor tileEditor;
 	private TileCanvas canvas;
 	private ApplicationLegend applicationLegend;
+	private LoadedSetup loadedSetup;
 	
     private String[] readInputs;
     public String resourceBasePath;
@@ -62,13 +65,14 @@ public class EditorMenuBar {
     private KeybindManager keybind = KeybindManager.getInstance();
     
     public EditorMenuBar(TileEditor tileEditor, TileCanvas canvas, ApplicationLegend applicationLegend, 
-    		String[] readInputs, String resourceBasePath) {
+    		String[] readInputs, LoadedSetup loadedSetup) {
     	this.tileEditor = tileEditor;
     	this.canvas = canvas;
     	this.applicationLegend = applicationLegend;
+    	this.loadedSetup = loadedSetup;
     	
     	this.readInputs = readInputs;
-    	this.resourceBasePath = resourceBasePath;
+    	this.resourceBasePath = loadedSetup.getResourceBasePath();
     	
     	mapStatistics = new MapStatistics(canvas.getMapState().getRegistry());
     }
@@ -758,19 +762,56 @@ public class EditorMenuBar {
 			String displayName = loc.getLanguageDisplayName(availableLocale);
 			JMenuItem langItem = new JMenuItem(displayName);
 			
+			//specifically apply a different font for Korean so that it can be rendered
+		    if ("ko".equalsIgnoreCase(availableLocale.getLanguage())) {
+		        langItem.setFont(loadedSetup.getUniversalFont(Font.PLAIN, 12));
+		    }
+			
 			langItem.setIcon(ImageUtils.getFlagIcon(availableLocale.getLanguage(), 16)); 
 			langItem.addActionListener(e -> {
-				LocalizationManager.getInstance().setLocale(availableLocale);
-				//save the selected language to settings
-				LocalizationManager.getInstance().saveCurrentLanguage();
-				int response = JOptionPane.showOptionDialog(frame,
-					loc.getString("language_restart"),
-					loc.getString("menu_language"),
-					JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE,
-					null, new Object[]{loc.getString("button_yes"), loc.getString("button_no")}, loc.getString("button_yes"));
-				if(response == JOptionPane.YES_OPTION) {
-					LocalizationManager.restartApplication(availableLocale);
-				}
+			    LocalizationManager.getInstance().setLocale(availableLocale);
+			    LocalizationManager.getInstance().saveCurrentLanguage();
+
+			    //create components for the dialog
+			    JLabel messageLabel = new JLabel(loc.getString("language_restart"));
+			    JButton yesButton = new JButton(loc.getString("button_yes"));
+			    JButton noButton = new JButton(loc.getString("button_no"));
+
+			    //apply font to dialog components only if it is Korean
+			    if ("ko".equalsIgnoreCase(availableLocale.getLanguage())) {
+			        Font dialogFont = loadedSetup.getUniversalFont(Font.PLAIN, 12);
+			        messageLabel.setFont(dialogFont);
+			        yesButton.setFont(dialogFont);
+			        noButton.setFont(dialogFont);
+			    }
+
+			    //attach click listeners to the buttons
+			    yesButton.addActionListener(evt -> {
+			        Window window = SwingUtilities.getWindowAncestor(yesButton);
+			        if (window != null) {
+			            window.dispose();
+			        }
+			        LocalizationManager.restartApplication(availableLocale);
+			    });
+
+			    noButton.addActionListener(evt -> {
+			        Window window = SwingUtilities.getWindowAncestor(noButton);
+			        if (window != null) {
+			            window.dispose();
+			        }
+			    });
+
+			    //show dialog using custom components
+			    JOptionPane.showOptionDialog(
+			        frame,
+			        messageLabel,
+			        loc.getString("menu_language"),
+			        JOptionPane.YES_NO_OPTION,
+			        JOptionPane.INFORMATION_MESSAGE,
+			        null,
+			        new Object[]{yesButton, noButton},
+			        yesButton
+			    );
 			});
 			langMenu.add(langItem);
 		}

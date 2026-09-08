@@ -27,12 +27,17 @@ public final class LocalizationManager {
 	//list of available locales
 	private static final Locale[] AVAILABLE_LOCALES = {
 		Locale.ENGLISH,
+		new Locale("de"),
 		new Locale("es"),
 		new Locale("fr"),
 		new Locale("it"),
 		new Locale("ro"),
 		new Locale("ru"),
-		new Locale("uk")
+		new Locale("uk"),
+		new Locale("ja"),
+		new Locale("ko"),
+		new Locale("zh_cn"),
+		new Locale("zh_tw")
 	};
 	
 	private LocalizationManager() {

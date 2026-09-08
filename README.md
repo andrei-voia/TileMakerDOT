@@ -190,7 +190,7 @@ The **`settings/`** folder contains text files used to modify default applicatio
 | `default_frame_ms_duration.txt` | Sets the global animation speed (in milliseconds). | `200` (Lower is faster) |
 | `default_grids.txt`             | Used to add quick-select buttons for common starting map sizes (in tiles). The first size listed is used as the default. | `50x50, 100x100` |
 | `default_keybinds.txt`          | Saves custom keybinding actions and shortcut key assignments. | Auto-updated when saving in Keybinding Settings inside the tool. |
-| `default_language.txt`          | Stores the selected interface language code. | en, ro, es, fr, it, ru, uk |
+| `default_language.txt`          | Stores the selected interface language code. | en, de, es, fr, it, ro, ru, uk, ja, ko, zh_cn, zh_tw |
 | `default_tile_size.txt`         | Sets the pixel size of a single tile. Objects and NPCs will be scaled proportional to this size. | A 128x128px house on a 64px tile map will occupy 2x2 tiles. |
 | `default_used_ids_list.txt`     | Whitelist Filter: A list of specific IDs the application is allowed to load. Useful for large asset folders where you only need a subset of items for a specific map. | Use the **Export Used IDs List** option in the app to automatically generate this file based on your current map. |
 | `factory_keybinds.txt`          | Read-only default keybinding template file. | Used the restore factory key shortcuts when clicking **Restore Defaults**. |
