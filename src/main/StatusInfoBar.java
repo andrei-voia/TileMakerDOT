@@ -52,14 +52,17 @@ public class StatusInfoBar {
         Icon icon = null;
         String modeText = loc.getString("status_paint_tile");
         
-        if(this.canvas.getSelected().isChunkSelectionTool()) {
+        if(selection.isChunkSelectionTool()) {
+        	icon = tileEditor.getEditorIcons().getChunkIcon();
         	modeText = loc.getString("status_chunk_selection");
         }
         //priority is NPC > Object > Tile
-        else if(this.canvas.getSelected().isNpcWalkAreaMode()) {
+        else if(selection.isNpcWalkAreaMode()) {
+        	icon = tileEditor.getEditorIcons().getWalkAreaIcon();
         	modeText = loc.getString("status_npc_walk_area");
         }
-        else if(this.canvas.getSelected().isBrushTool()) {
+        else if(selection.isBrushTool()) {
+        	icon = tileEditor.getEditorIcons().getBrushIcon();
         	modeText = loc.getString("status_brush_mode");
         }
         else if (selection.isNpcMode()) {

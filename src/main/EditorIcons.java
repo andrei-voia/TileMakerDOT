@@ -17,6 +17,10 @@ public class EditorIcons {
 	
     private ImageIcon eraserIcon;
     private ImageIcon noteIcon;
+    private ImageIcon brushIcon;
+    private ImageIcon chunkIcon;
+    private ImageIcon walkAreaIcon;
+    
     private BufferedImage notFoundIcon;
     private BufferedImage deleteImage;
     private BufferedImage objectPickerImage;
@@ -51,6 +55,18 @@ public class EditorIcons {
             this.noteIcon = new ImageIcon(ImageIO.read(new File(Utils.DEFAULT_BASE_PATH, "/icons/note_icon.png"))
             		.getScaledInstance(defaultSelectedTile, defaultSelectedTile, Image.SCALE_SMOOTH));
             
+            //load the entire brush icon
+            this.brushIcon = new ImageIcon(ImageIO.read(new File(Utils.DEFAULT_BASE_PATH, "/icons/brush_icon.png"))
+            		.getScaledInstance(defaultSelectedTile, defaultSelectedTile, Image.SCALE_SMOOTH));
+            
+            //load the entire chunk icon
+            this.chunkIcon = new ImageIcon(ImageIO.read(new File(Utils.DEFAULT_BASE_PATH, "/icons/chunk_icon.png"))
+            		.getScaledInstance(defaultSelectedTile, defaultSelectedTile, Image.SCALE_SMOOTH));
+            
+            //load the walk area for NPCs icon
+            this.walkAreaIcon = new ImageIcon(ImageIO.read(new File(Utils.DEFAULT_BASE_PATH, "/icons/walk_area_icon.png"))
+            		.getScaledInstance(defaultSelectedTile, defaultSelectedTile, Image.SCALE_SMOOTH));
+
         } catch (IOException e) {
             System.err.println("Could not load application icon: " + e.getMessage());
             //the application will still run without the icon
@@ -67,6 +83,18 @@ public class EditorIcons {
 	
 	public ImageIcon getNoteIcon() {
 		return noteIcon;
+	}
+	
+	public ImageIcon getBrushIcon() {
+		return brushIcon;
+	}
+
+	public ImageIcon getChunkIcon() {
+		return chunkIcon;
+	}
+
+	public ImageIcon getWalkAreaIcon() {
+		return walkAreaIcon;
 	}
 
 	public BufferedImage getNotFoundIcon() {

@@ -103,6 +103,12 @@ public class MouseController extends MouseAdapter {
 			if (row < 0 || row >= mapState.getData().getRows() || col < 0 || col >= mapState.getData().getCols())
 				return;
 			
+			//add a POPUP notification when using brush to tell you how to use it to paint
+			if(tileCanvas.getSelected().isBrushTool() && !e.isShiftDown() && !e.isAltDown()) {
+				tileCanvas.getToastNotification().showToastNotification("Hold Shift or Alt + Left-Click Drag to place objects");
+				return;
+			}
+			
 			//add annotations to the map by left clicking it when active
 			if(tileCanvas.getSelected().isNotesTool()) {
 				updateAnnotatedNotes(e, col, row);
@@ -126,6 +132,12 @@ public class MouseController extends MouseAdapter {
 			
 			//used to copy paste zones in other parts
 			if (tileCanvas.getSelected().isChunkSelectionTool()) {
+				//add a POPUP notification when using chunk to tell you how to use it to select a chunk
+				if(chunkSelectionTool.getMapChunk() == null && !e.isShiftDown() && !e.isAltDown()) {
+					tileCanvas.getToastNotification().showToastNotification("Hold Shift or Alt + Left-Click Drag to select a zone to copy");
+					return;
+				}
+				
 				if ((e.isShiftDown() || e.isAltDown()) && selectionStartPoint == null) {
 					//start rectangle selection
 					selectionStartPoint = e.getPoint();

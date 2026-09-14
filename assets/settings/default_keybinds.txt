@@ -30,8 +30,8 @@ action.keybind_settings=ctrl K
 # Tools Menu
 action.notes_tool=ctrl N
 action.scatter_brush=B
-action.clean_brush=C
-action.chunk_selection=S
+action.clean_brush=alt C
+action.chunk_selection=C
 action.cleanup_assets=V
 
 # Mode Menu
