@@ -105,7 +105,7 @@ public class MouseController extends MouseAdapter {
 			
 			//add a POPUP notification when using brush to tell you how to use it to paint
 			if(tileCanvas.getSelected().isBrushTool() && !e.isShiftDown() && !e.isAltDown()) {
-				tileCanvas.getToastNotification().showToastNotification("Hold Shift or Alt + Left-Click Drag to place objects");
+				tileCanvas.getToastNotification().showToastNotification(loc.getString("toast_brush_how_to_use"));
 				return;
 			}
 			
@@ -134,7 +134,7 @@ public class MouseController extends MouseAdapter {
 			if (tileCanvas.getSelected().isChunkSelectionTool()) {
 				//add a POPUP notification when using chunk to tell you how to use it to select a chunk
 				if(chunkSelectionTool.getMapChunk() == null && !e.isShiftDown() && !e.isAltDown()) {
-					tileCanvas.getToastNotification().showToastNotification("Hold Shift or Alt + Left-Click Drag to select a zone to copy");
+					tileCanvas.getToastNotification().showToastNotification(loc.getString("toast_chunk_how_to_use"));
 					return;
 				}
 				
@@ -191,6 +191,7 @@ public class MouseController extends MouseAdapter {
 	public void mouseDragged(MouseEvent e) {
 	    if (tileCanvas.getDraggedItem().getItemSource() != null) {
 	    	canvasViewState.setObjectPreviewPosition(getHoverTileRowCol());
+	    	canvasViewState.setShowDraggingText(true);
 	    	//force the ghost to follow the mouse
 	    	tileCanvas.getCanvasRenderer().repaint();
 	    	//do not allow panning / selection while moving an object
@@ -301,6 +302,7 @@ public class MouseController extends MouseAdapter {
 	        //reset state
 	        tileCanvas.getDraggedItem().reset();
 	        tileCanvas.getCanvasRenderer().repaint();
+	        canvasViewState.setShowDraggingText(false);
 	        return;
 	    }
 		

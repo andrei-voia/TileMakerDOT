@@ -24,6 +24,7 @@ import data.MapNote;
 import data.NoteColor;
 import data.Selection;
 import data.SelectionDragged;
+import localization.LocalizationManager;
 import utils.Utils;
 
 public class CanvasRenderer extends JPanel {
@@ -513,12 +514,32 @@ public class CanvasRenderer extends JPanel {
             g2d.setTransform(originalTransform);
         }
         
-        if(canvasViewState.isShowTilePosition()) {
+        //show the x y coordinates of the mouse relative to the map
+        if(canvasViewState.isShowTilePosition() && !canvasViewState.isShowDraggingText()) {
         	drawMouseCoordinates(g2d, viewportTransform);
+        }
+        
+        //show the user that an object is being dragged
+        if(canvasViewState.isShowDraggingText()) {
+        	drawMouseText(g2d, viewportTransform, LocalizationManager.getInstance().getString("draw_mouse_move"));
         }
 	}
 	
 	private void drawMouseCoordinates(Graphics2D g2d, AffineTransform viewportTransform) {
+	    Point mousePos = getMousePosition();
+	    if (mousePos != null) {
+	        //calculate tile coordinates next to the mouse cursor
+	        int tileX = (int) Math.floor(tileCanvas.getCamera().posX(mousePos.x, tileSize));
+	        int tileY = (int) Math.floor(tileCanvas.getCamera().posY(mousePos.y, tileSize));
+
+	        //setup drawing
+	        String coordText = String.format("[X=%d; Y=%d]", tileX, tileY);
+	        
+	        drawMouseText(g2d, viewportTransform, coordText);
+	    }
+	}
+	
+	private void drawMouseText(Graphics2D g2d, AffineTransform viewportTransform, String text) {
 	    Point mousePos = getMousePosition();
 	    if (mousePos != null) {
 	        //calculate tile coordinates next to the mouse cursor
@@ -533,11 +554,10 @@ public class CanvasRenderer extends JPanel {
 	        g2d.setTransform(viewportTransform);
 
 	        //setup drawing
-	        String coordText = String.format("[X=%d; Y=%d]", tileX, tileY);
 	        g2d.setFont(new Font("Monospaced", Font.BOLD, 15));
 	        FontMetrics fm = g2d.getFontMetrics();
 	        
-	        int tw = fm.stringWidth(coordText);
+	        int tw = fm.stringWidth(text);
 	        int th = fm.getHeight();
 	        int pad = 4;
 	        
@@ -550,7 +570,7 @@ public class CanvasRenderer extends JPanel {
 
 	        //draw text
 	        g2d.setColor(Color.CYAN);
-	        g2d.drawString(coordText, drawX + pad, drawY + pad + fm.getAscent());
+	        g2d.drawString(text, drawX + pad, drawY + pad + fm.getAscent());
 
 	        //restore
 	        g2d.setTransform(mapTransform);

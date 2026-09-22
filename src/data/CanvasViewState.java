@@ -15,6 +15,8 @@ public class CanvasViewState {
 	private boolean locateMode = false;
 	private boolean nightMode = false;
 	private boolean showNotesTool = true;
+	//used to tell the user that an object is being dragged
+	private boolean showDraggingText = false;
 	
 	public void toggleNightMode() {
 		nightMode = !nightMode;
@@ -142,5 +144,13 @@ public class CanvasViewState {
 
 	public void setShowNotesTool(boolean showNotesTool) {
 		this.showNotesTool = showNotesTool;
+	}
+
+	public boolean isShowDraggingText() {
+		return showDraggingText;
+	}
+
+	public void setShowDraggingText(boolean showDraggingText) {
+		this.showDraggingText = showDraggingText;
 	}
 }

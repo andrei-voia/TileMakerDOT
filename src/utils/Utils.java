@@ -1,8 +1,10 @@
 package utils;
 
 import java.awt.Color;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 
 import core.Tile;
@@ -298,4 +301,41 @@ public final class Utils {
         }
         return sizes;
     }
+    
+	public static int loadMapTileSize(File file) {
+		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+
+			// read dimensions
+			String line = br.readLine();
+			if (line == null) {
+				throw new IOException("Map file is empty or corrupted.");
+			}
+			String[] dims = line.split(",");
+			if (dims.length < 2) {
+				throw new IOException("Missing map dimensions in the file.");
+			}
+
+			// read the tile size
+			line = br.readLine();
+			line = br.readLine();
+			
+			return Integer.parseInt(line.trim());
+			
+		} catch (FileNotFoundException e) {
+			JOptionPane.showMessageDialog(null, 
+					LocalizationManager.getInstance().getString("dialog_file_not_found"), 
+					LocalizationManager.getInstance().getString("dialog_load_error"), 
+					JOptionPane.ERROR_MESSAGE);
+			System.exit(0);
+		} catch (IOException e) {
+			JOptionPane.showMessageDialog(null, 
+					LocalizationManager.getInstance().getString("dialog_error_map_reading") + e.getMessage(), 
+					LocalizationManager.getInstance().getString("dialog_load_error"),
+					JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();
+			System.exit(0);
+		}
+		
+		return -1;
+	}
 }

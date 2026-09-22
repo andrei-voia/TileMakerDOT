@@ -85,9 +85,40 @@ public class TileEditor {
         			Long.toString(loadedSetup.getFrameDuration())};
         	
         	//we set this here now because we do not make the editor window anymore
-            getLoadedSetup().setOldResourceBasePath(getLoadedSetup().getResourceBasePath());
+        	loadedSetup.setOldResourceBasePath(loadedSetup.getResourceBasePath());
             //store the path for later use in loading methods
-            getLoadedSetup().setResourceBasePath(getLoadedSetup().getResourceBasePath());
+        	loadedSetup.setResourceBasePath(loadedSetup.getResourceBasePath());
+        	
+        	//read the tile size from the loaded map
+        	File fileToLoad = extractFileFromParamArgs();
+        	int loadedMapTileSize = Utils.loadMapTileSize(fileToLoad);
+        	
+        	//check if the tile size from assets coincide with the tile size from loaded map
+        	if(Integer.parseInt(loadedSetup.getTileSizeLoaded()) != loadedMapTileSize) {
+        		//show a new window with a warning that lets the user to correct the assets path if needed
+            	AssetPathWindow pathWindow = new AssetPathWindow(loadedSetup.getResourceBasePath(),
+            			loadedMapTileSize, Integer.parseInt(loadedSetup.getTileSizeLoaded()));
+            	String[] result = pathWindow.showPathSelectionDialog();
+
+            	if (result != null) {
+            	    String selectedTileSize = result[0];
+            	    String selectedAssetsPath = result[1];
+            	    
+                	//if the user changed the assets path then we save the new path
+                	if(selectedAssetsPath != null) {
+                    	//we set this here now because we do not make the editor window anymore
+                    	loadedSetup.setOldResourceBasePath(loadedSetup.getResourceBasePath());
+                        //store the path for later use in loading methods
+                    	loadedSetup.setResourceBasePath(selectedAssetsPath);
+                	}
+                	
+                	//also set the new tile size if the user changed it
+                	inputs = new String[]{loadedSetup.getDefaultSizes().get(0), 
+                			selectedTileSize, 
+                			Boolean.toString(false), 
+                			Long.toString(loadedSetup.getFrameDuration())};
+            	}
+        	}
         }
         
         if (inputs == null || inputs.length != 4 || !inputs[0].matches("\\d+x\\d+") || !inputs[1].matches("\\d+")) {
@@ -335,13 +366,7 @@ public class TileEditor {
     //method used to check if a saved file .tmdot was double clicked to open a map before opening the tool
     private void autoloadOpenedSavedFiles() {
         if (appParamsExist()) {
-            //join all arguments with a space to reconstruct paths that contain spaces
-            String fullPath = String.join(" ", PARAM_ARGS);
-            
-            //clean up any accidental double quotes Windows might wrap around it
-            fullPath = fullPath.replace("\"", ""); 
-            
-            File fileToLoad = new File(fullPath);
+        	File fileToLoad = extractFileFromParamArgs();
             
             //verify the file actually exists before trying to load
             if (fileToLoad.exists() && fileToLoad.isFile()) {
@@ -351,6 +376,17 @@ public class TileEditor {
                 canvas.getMapLoader().loadMap(fileToLoad);
             }
         }
+    }
+    
+    private File extractFileFromParamArgs() {
+        //join all arguments with a space to reconstruct paths that contain spaces
+        String fullPath = String.join(" ", PARAM_ARGS);
+        
+        //clean up any accidental double quotes Windows might wrap around it
+        fullPath = fullPath.replace("\"", ""); 
+        
+        File fileToLoad = new File(fullPath);
+        return fileToLoad;
     }
     
     //displays a confirmation dialog and exits the application if the user confirms
