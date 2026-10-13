@@ -21,6 +21,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 
 import core.Tile;
 import localization.LocalizationManager;
@@ -302,10 +303,10 @@ public final class Utils {
         return sizes;
     }
     
-	public static int loadMapTileSize(File file) {
+	public static int loadMapTileSize(File file, JFrame frame) {
 		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
 
-			// read dimensions
+			//read dimensions
 			String line = br.readLine();
 			if (line == null) {
 				throw new IOException("Map file is empty or corrupted.");
@@ -315,20 +316,20 @@ public final class Utils {
 				throw new IOException("Missing map dimensions in the file.");
 			}
 
-			// read the tile size
+			//read the tile size
 			line = br.readLine();
 			line = br.readLine();
 			
 			return Integer.parseInt(line.trim());
 			
 		} catch (FileNotFoundException e) {
-			JOptionPane.showMessageDialog(null, 
+			JOptionPane.showMessageDialog(frame, 
 					LocalizationManager.getInstance().getString("dialog_file_not_found"), 
 					LocalizationManager.getInstance().getString("dialog_load_error"), 
 					JOptionPane.ERROR_MESSAGE);
 			System.exit(0);
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(null, 
+			JOptionPane.showMessageDialog(frame, 
 					LocalizationManager.getInstance().getString("dialog_error_map_reading") + e.getMessage(), 
 					LocalizationManager.getInstance().getString("dialog_load_error"),
 					JOptionPane.ERROR_MESSAGE);
@@ -337,5 +338,22 @@ public final class Utils {
 		}
 		
 		return -1;
+	}
+	
+	//initialize translations in all languages for buttons in dialog windows
+	public static void initLocalizedDialogs() {
+        //generally set all those buttons to use the translated text wherever they will be used
+        UIManager.put("OptionPane.okButtonText", LocalizationManager.getInstance().getString("button_ok"));
+        UIManager.put("OptionPane.cancelButtonText", LocalizationManager.getInstance().getString("button_cancel"));
+        UIManager.put("OptionPane.yesButtonText", LocalizationManager.getInstance().getString("button_yes"));
+        UIManager.put("OptionPane.noButtonText", LocalizationManager.getInstance().getString("button_no"));
+        UIManager.put("OptionPane.messageDialogTitle", LocalizationManager.getInstance().getString("dialog_default_title"));
+        
+        //dialog titles
+        UIManager.put("FileChooser.openDialogTitleText", LocalizationManager.getInstance().getString("dialog_open_title"));
+        UIManager.put("FileChooser.saveDialogTitleText", LocalizationManager.getInstance().getString("dialog_save_title"));
+        UIManager.put("FileChooser.openButtonText", LocalizationManager.getInstance().getString("button_open"));
+        UIManager.put("FileChooser.saveButtonText", LocalizationManager.getInstance().getString("button_save"));
+        UIManager.put("FileChooser.cancelButtonText", LocalizationManager.getInstance().getString("button_cancel"));
 	}
 }

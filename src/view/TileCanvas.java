@@ -111,7 +111,7 @@ public class TileCanvas {
 		brushTool = new BrushTool(mapState, historyFunction);
 		
 		extendMapTool = new ExtendMapTool(mapState, historyFunction, camera, 
-				canvasViewState, canvasRenderer, keyController);
+				canvasViewState, canvasRenderer, keyController, tileEditor.getMainFrame());
 		
 		annotatedNotesTool = new AnnotatedNotesTool();
 		
@@ -226,7 +226,7 @@ public class TileCanvas {
 			mapState.refreshAutotileMap();
 		mapState.refreshAllObjectsList();
 		canvasRenderer.repaint();
-	    JOptionPane.showMessageDialog(canvasRenderer, 
+	    JOptionPane.showMessageDialog(tileEditor.getMainFrame(), 
 	    	loc.getFormattedString("menu_cleanup_complete", removedTilesCount, removedObjectsCount, removedNPCsCount), 
 	    	loc.getString("menu_cleanup_title"), 
 	        JOptionPane.INFORMATION_MESSAGE);

@@ -2,6 +2,7 @@ package tools;
 
 import java.util.Arrays;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import data.CanvasViewState;
@@ -21,14 +22,19 @@ public class ExtendMapTool {
 	private CanvasRenderer canvasRenderer;
 	private KeyController keyController;
 	
+	private JFrame frame;
+	
 	public ExtendMapTool(MapState mapState, HistoryFunction historyFunction, Camera camera, 
-			CanvasViewState canvasViewState, CanvasRenderer canvasRenderer, KeyController keyController) {
+			CanvasViewState canvasViewState, CanvasRenderer canvasRenderer, KeyController keyController,
+			JFrame frame) {
 		this.mapState = mapState;
 		this.historyFunction = historyFunction;
 		this.camera = camera;
 		this.canvasViewState = canvasViewState;
 		this.canvasRenderer = canvasRenderer;
 		this.keyController = keyController;
+		
+		this.frame = frame;
 	}
 	
 	//logic for extending and shrinking the map
@@ -36,7 +42,7 @@ public class ExtendMapTool {
 		LocalizationManager loc = LocalizationManager.getInstance();
 		
 		if(delta == 0) {
-			JOptionPane.showMessageDialog(null,
+			JOptionPane.showMessageDialog(frame,
 					loc.getFormattedString("dialog_extend_error_change", delta),
 					loc.getString("dialog_extend_error"), JOptionPane.ERROR_MESSAGE);
 			return;
@@ -57,7 +63,7 @@ public class ExtendMapTool {
 		}
 
 		if (newRows <= 0 || newCols <= 0) {
-			JOptionPane.showMessageDialog(null,
+			JOptionPane.showMessageDialog(frame,
 					loc.getFormattedString("dialog_extend_invalid", delta, newRows, newCols),
 					loc.getString("dialog_extend_error"), JOptionPane.ERROR_MESSAGE);
 			return;

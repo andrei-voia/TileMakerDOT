@@ -3,6 +3,7 @@ package data;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import localization.LocalizationManager;
@@ -16,9 +17,11 @@ public class HistoryData {
 	private Deque<MapData> redoStack = new ArrayDeque<>();
 	
 	protected MapState mapState;
+	private JFrame frame;
 	
-	public HistoryData(MapState mapState) {
+	public HistoryData(MapState mapState, JFrame frame) {
 		this.mapState = mapState;
+		this.frame = frame;
 	}
 	
 	public void saveState() {
@@ -55,7 +58,7 @@ public class HistoryData {
 	        
 	        //inform the user about the RAM usage and how it was solved
 	        JOptionPane.showMessageDialog(
-	            null,
+	        	frame,
 	            LocalizationManager.getInstance().getFormattedString("dialog_memory_warning_message", MAX_UNDO_STATES),
 	            LocalizationManager.getInstance().getString("dialog_memory_warning"),
 	            JOptionPane.ERROR_MESSAGE

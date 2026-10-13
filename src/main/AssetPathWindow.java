@@ -13,11 +13,11 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import localization.LocalizationManager;
 import utils.OSDetector;
+import utils.Utils;
 
 public class AssetPathWindow {
 
@@ -25,33 +25,24 @@ public class AssetPathWindow {
     private int mapTileSize = -1;
     private int assetTileSize = -1;
 
-    public AssetPathWindow(String defaultPath, int mapTileSize) {
-        this.defaultPath = defaultPath;
-        this.mapTileSize = mapTileSize;
-    }
-
     public AssetPathWindow(String defaultPath, int mapTileSize, int assetTileSize) {
         this.defaultPath = defaultPath;
         this.mapTileSize = mapTileSize;
         this.assetTileSize = assetTileSize;
     }
 
-    /**
-     * Shows a dialog to select the asset folder path and tile size[cite: 2, 3].
-     * @return String array containing [tileSize, assetPath], or null if cancelled/invalid[cite: 2].
-     */
     public String[] showPathSelectionDialog() {
         LocalizationManager loc = LocalizationManager.getInstance();
 
         JTextField pathField = new JTextField(defaultPath != null ? defaultPath : "", 20);
         JTextField tileSizeField = new JTextField(mapTileSize > 0 ? String.valueOf(mapTileSize) : "", 5);
 
-        // Panel for tile size input
+        //panel for tile size input
         JPanel tileSizePanel = new JPanel(new BorderLayout(5, 5));
         tileSizePanel.add(new JLabel(loc.getString("startup_tile_label")), BorderLayout.NORTH);
         tileSizePanel.add(tileSizeField, BorderLayout.CENTER);
 
-        // Panel for assets path input
+        //panel for assets path input
         JPanel pathPanel = new JPanel(new BorderLayout(5, 5));
         String osExample = switch (OSDetector.detectOS()) {
             case "Windows" -> "C:/MyAssets";
@@ -60,7 +51,7 @@ public class AssetPathWindow {
         };
         pathPanel.add(new JLabel(loc.getFormattedString("startup_path_label", osExample)), BorderLayout.NORTH);
 
-        // Add browse button with file chooser pre-targeted to current input
+        //add browse button with file chooser
         JButton browseButton = new JButton(loc.getString("startup_browse"));
         browseButton.addActionListener(e -> {
             JFileChooser chooser = new JFileChooser();
@@ -80,16 +71,15 @@ public class AssetPathWindow {
         pathInputGroup.add(browseButton, BorderLayout.EAST);
         pathPanel.add(pathInputGroup, BorderLayout.CENTER);
 
-        // Main input container combining path and tile size inputs
+        //main input container combining path and tile size inputs
         JPanel mainInputPanel = new JPanel(new GridLayout(2, 1, 10, 10));
         mainInputPanel.add(pathPanel);
         mainInputPanel.add(tileSizePanel);
 
-        // Main dialog content panel
         JPanel dialogPanel = new JPanel(new BorderLayout(10, 10));
         dialogPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
-        // Add warning message panel if tile sizes mismatch
+        //add warning message panel if tile sizes mismatch
         if (hasTileSizeMismatch()) {
             JPanel warningPanel = createWarningPanel(loc);
             dialogPanel.add(warningPanel, BorderLayout.NORTH);
@@ -97,12 +87,8 @@ public class AssetPathWindow {
 
         dialogPanel.add(mainInputPanel, BorderLayout.CENTER);
 
-        // Localize option buttons and file chooser
-        UIManager.put("OptionPane.okButtonText", loc.getString("button_ok"));
-        UIManager.put("OptionPane.cancelButtonText", loc.getString("button_cancel"));
-        UIManager.put("FileChooser.openDialogTitleText", loc.getString("dialog_open_title"));
-        UIManager.put("FileChooser.openButtonText", loc.getString("button_open"));
-        UIManager.put("FileChooser.cancelButtonText", loc.getString("button_cancel"));
+        //localize option buttons and file chooser
+        Utils.initLocalizedDialogs();
 
         JOptionPane optionPane = new JOptionPane(
             dialogPanel,
@@ -119,9 +105,9 @@ public class AssetPathWindow {
             String tileSize = tileSizeField.getText().trim();
             String assetPath = pathField.getText().trim();
 
-            // Validation for tile size
+            //validation for tile size
             if (!tileSize.matches("\\d+") || Integer.parseInt(tileSize) <= 0) {
-                 JOptionPane.showMessageDialog(null, loc.getString("startup_invalid_tile"), loc.getString("startup_error_title"), JOptionPane.ERROR_MESSAGE);
+                 JOptionPane.showMessageDialog(dialog, loc.getString("startup_invalid_tile"), loc.getString("startup_error_title"), JOptionPane.ERROR_MESSAGE);
                  return null;
             }
 
@@ -137,7 +123,8 @@ public class AssetPathWindow {
 
     private JPanel createWarningPanel(LocalizationManager loc) {
         JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(new Color(255, 243, 205)); // Light warning yellow
+        //light yellow warning
+        panel.setBackground(new Color(255, 243, 205));
         panel.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(new Color(255, 238, 186), 1),
             new EmptyBorder(8, 8, 8, 8)
@@ -149,12 +136,6 @@ public class AssetPathWindow {
             mapTileSize
         );
         
-        if (warningMessage == null || warningMessage.startsWith("!")) {
-            warningMessage = "<b>Warning:</b> Loaded asset tile size (" + assetTileSize + "px) " +
-                    "does not match map tile size (" + mapTileSize + "px). " +
-                    "Using these textures may cause visual issues. Select a different folder if needed.";
-        }
-
         JLabel warningLabel = new JLabel("<html><body style='width: 300px; color: #856404;'>" 
                 + warningMessage + "</body></html>");
 

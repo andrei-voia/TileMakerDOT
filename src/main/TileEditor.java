@@ -51,6 +51,9 @@ public class TileEditor {
     private JTabbedPane objectTabs;
     private JTabbedPane npcTabs;
     
+    //used to save the main application frame
+    private JFrame mainFrame;
+    
     //used to read the parsed tool parameters for loading saved files
     private static String[] PARAM_ARGS;
     
@@ -91,7 +94,7 @@ public class TileEditor {
         	
         	//read the tile size from the loaded map
         	File fileToLoad = extractFileFromParamArgs();
-        	int loadedMapTileSize = Utils.loadMapTileSize(fileToLoad);
+        	int loadedMapTileSize = Utils.loadMapTileSize(fileToLoad, mainFrame);
         	
         	//check if the tile size from assets coincide with the tile size from loaded map
         	if(Integer.parseInt(loadedSetup.getTileSizeLoaded()) != loadedMapTileSize) {
@@ -145,11 +148,11 @@ public class TileEditor {
         }
         
         //create the main frame
-        JFrame frame = new JFrame("TileMaker DOT");
-        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        mainFrame = new JFrame("TileMaker DOT");
+        mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 
         //create and show the loading screen
-        JDialog loadingDialog = Utils.createLoadingDialog(frame);
+        JDialog loadingDialog = Utils.createLoadingDialog(mainFrame);
         //position it in the center of the screen
         loadingDialog.setLocationRelativeTo(null);
         
@@ -162,7 +165,7 @@ public class TileEditor {
         applicationLegend = new ApplicationLegend();
         
         //start the work on a background thread
-        resourceWorker = new ResourceLoaderWorker(frame, loadingDialog, inputs, this);
+        resourceWorker = new ResourceLoaderWorker(mainFrame, loadingDialog, inputs, this);
         resourceWorker.execute();
     }
     
@@ -457,5 +460,9 @@ public class TileEditor {
 
 	public SearchFieldFunction getSearchFieldFunction() {
 		return searchFieldFunction;
+	}
+
+	public JFrame getMainFrame() {
+		return mainFrame;
 	}
 }

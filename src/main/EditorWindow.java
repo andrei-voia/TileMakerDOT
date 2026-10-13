@@ -17,11 +17,11 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 
 import localization.LocalizationManager;
 import utils.OSDetector;
+import utils.Utils;
 
 public class EditorWindow {
 	
@@ -126,18 +126,7 @@ public class EditorWindow {
         dialogPanel.add(optionsPanel, BorderLayout.CENTER);
         
         //generally set all those buttons to use the translated text wherever they will be used
-        UIManager.put("OptionPane.okButtonText", loc.getString("button_ok"));
-        UIManager.put("OptionPane.cancelButtonText", loc.getString("button_cancel"));
-        UIManager.put("OptionPane.yesButtonText", loc.getString("button_yes"));
-        UIManager.put("OptionPane.noButtonText", loc.getString("button_no"));
-        UIManager.put("OptionPane.messageDialogTitle", loc.getString("dialog_default_title"));
-        
-        //dialog titles
-        UIManager.put("FileChooser.openDialogTitleText", loc.getString("dialog_open_title"));
-        UIManager.put("FileChooser.saveDialogTitleText", loc.getString("dialog_save_title"));
-        UIManager.put("FileChooser.openButtonText", loc.getString("button_open"));
-        UIManager.put("FileChooser.saveButtonText", loc.getString("button_save"));
-        UIManager.put("FileChooser.cancelButtonText", loc.getString("button_cancel"));
+        Utils.initLocalizedDialogs();
         
         JOptionPane optionPane = new JOptionPane(
             dialogPanel,
@@ -166,13 +155,13 @@ public class EditorWindow {
             
             //basic validation for tile size
             if (!tileSize.matches("\\d+") || Integer.parseInt(tileSize) <= 0) {
-                 JOptionPane.showMessageDialog(null, loc.getString("startup_invalid_tile"), loc.getString("startup_error_title"), JOptionPane.ERROR_MESSAGE);
+                 JOptionPane.showMessageDialog(dialog, loc.getString("startup_invalid_tile"), loc.getString("startup_error_title"), JOptionPane.ERROR_MESSAGE);
                  return null;
             }
             
             //basic validation for animation speed
             if (!animationDuration.matches("\\d+") || Integer.parseInt(animationDuration) <= 0) {
-                 JOptionPane.showMessageDialog(null, loc.getString("startup_invalid_anim"), loc.getString("startup_error_title"), JOptionPane.ERROR_MESSAGE);
+                 JOptionPane.showMessageDialog(dialog, loc.getString("startup_invalid_anim"), loc.getString("startup_error_title"), JOptionPane.ERROR_MESSAGE);
                  return null;
             }
             
