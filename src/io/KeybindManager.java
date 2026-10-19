@@ -13,12 +13,14 @@ import java.util.Set;
 
 import javax.swing.KeyStroke;
 
+import utils.Utils;
+
 public class KeybindManager {
 
     private static KeybindManager instance;
     
-    private static final String KEYBIND_FILE_PATH = "assets/settings/default_keybinds.txt";
-    private static final String FACTORY_FILE_PATH = "assets/settings/factory_keybinds.txt";
+    private static final String KEYBIND_FILE_PATH = Utils.ASSETS_SETTINGS_PATH + "default_keybinds.txt";
+    private static final String FACTORY_FILE_PATH = Utils.ASSETS_SETTINGS_PATH + "factory_keybinds.txt";
     public static final String NONE = "None";
     
     private final Properties properties = new Properties();
@@ -99,7 +101,7 @@ public class KeybindManager {
                 "action.load_map", "action.quick_save", "action.save_as",
                 "action.import_spritesheet", "action.import_chunk", "action.export_chunk",
                 "action.export_tmx", "action.export_lvl", "action.export_csv",
-                "action.export_json", "action.export_ids", "action.export_png"
+                "action.export_json", "action.export_ids", "action.save_ids", "action.export_png"
             });
 
             writeSection(writer, "Edit Menu", new String[]{

@@ -1,3 +1,4 @@
+# ACTIVE: false
 # Note: Existing Autotile IDs are not saved in this file... Keep in mind.
 
 # Tiles IDs (2):

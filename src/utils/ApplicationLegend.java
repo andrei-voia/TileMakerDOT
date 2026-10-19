@@ -9,6 +9,8 @@ import javax.swing.JScrollPane;
 
 public class ApplicationLegend {
 	
+	public static final String APP_VERSION = "TileMaker DOT v2.7.0";
+	
 	private JScrollPane scrollPane;
 	
 	public ApplicationLegend() {
@@ -53,6 +55,7 @@ public class ApplicationLegend {
             <li><b>Export Map</b> → Save game-ready data in universal formats</li>
         	             Note: (*.csv, *.json, *.xml, *.tmx, *.tsx, *.tmj, *.lvl)
             <li><b>Export Used IDs List</b> → Save a list of only the used tiles, objects and NPCs on the map</li>
+            <li><b>Update Default Used IDs</b> → Overwrite the default used IDs list file with the currently active tiles, objects, and NPCs on the map</li>
             <li><b>Export Image</b> → Save map as PNG image</li>
             </ul>
                         
@@ -148,7 +151,7 @@ public class ApplicationLegend {
 	
 	public void showAbout(JFrame frame) {
 		String aboutMessage = "<html><body style='width: 260px; padding: 10px;'>" +
-			    "<h1 style='color: #58a6ff; margin-bottom: 0;'>TileMaker DOT v2.6.8</h1>" + 
+			    "<h1 style='color: #58a6ff; margin-bottom: 0;'>" + APP_VERSION + "</h1>" + 
 			    "<p style='margin-top: 0;'>Professional Map Engineering Tool</p>" +
 			    "<p>Created by <b>Andrei Voia</b></p>" +
 			    "<br><hr>" +

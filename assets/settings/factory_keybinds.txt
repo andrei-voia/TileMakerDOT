@@ -12,6 +12,7 @@ action.export_lvl=ctrl X
 action.export_csv=ctrl V
 action.export_json=ctrl J
 action.export_ids=ctrl U
+action.save_ids=ctrl shift U
 action.export_png=ctrl I
 
 # Edit Menu

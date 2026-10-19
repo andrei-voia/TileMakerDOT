@@ -57,7 +57,9 @@ public class MapExporter {
 					chunkSelectionTool.getMapChunk().getWalkArea());
 		}
 		else {
-			JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_select_chunk"), loc.getString("dialog_default_title"),
+			JOptionPane.showMessageDialog(tileCanvas.getTileEditor().getMainFrame(), 
+					loc.getString("dialog_select_chunk"), 
+					loc.getString("dialog_default_title"),
 					JOptionPane.INFORMATION_MESSAGE);
 		}
 	}
@@ -172,11 +174,15 @@ public class MapExporter {
 			mapState.getCacheData().setCanQuickSave(false);
 			
 			if (showMessage) {
-				JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_map_save_success") + file.getName(), loc.getString("dialog_save_success"),
+				JOptionPane.showMessageDialog(tileCanvas.getTileEditor().getMainFrame(), 
+						loc.getString("dialog_map_save_success") + file.getName(), 
+						loc.getString("dialog_save_success"),
 						JOptionPane.INFORMATION_MESSAGE);
 			}
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_error_map_save") + e.getMessage(), loc.getString("dialog_save_error"),
+			JOptionPane.showMessageDialog(tileCanvas.getTileEditor().getMainFrame(), 
+					loc.getString("dialog_error_map_save") + e.getMessage(), 
+					loc.getString("dialog_save_error"),
 					JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
@@ -368,10 +374,14 @@ public class MapExporter {
 					+ " \"width\":" + mapState.getData().getCols() + "\r\n"
 					+ "}");
 
-			JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_tile_export_success") + file.getName(), loc.getString("dialog_save_success"),
+			JOptionPane.showMessageDialog(tileCanvas.getTileEditor().getMainFrame(), 
+					loc.getString("dialog_tile_export_success") + file.getName(), 
+					loc.getString("dialog_save_success"),
 					JOptionPane.INFORMATION_MESSAGE);
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_error_export_map") + e.getMessage(), loc.getString("dialog_save_error"),
+			JOptionPane.showMessageDialog(tileCanvas.getTileEditor().getMainFrame(), 
+					loc.getString("dialog_error_export_map") + e.getMessage(), 
+					loc.getString("dialog_save_error"),
 					JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
@@ -406,7 +416,9 @@ public class MapExporter {
 	    try (PrintWriter pwt = new PrintWriter(new FileOutputStream(tilesFile))) {
 			pwt.println(this.generateTileLayer(-1, ""));
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_error_export_map") + e.getMessage(), loc.getString("dialog_save_error"),
+			JOptionPane.showMessageDialog(tileCanvas.getTileEditor().getMainFrame(), 
+					loc.getString("dialog_error_export_map") + e.getMessage(), 
+					loc.getString("dialog_save_error"),
 					JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
@@ -414,7 +426,9 @@ public class MapExporter {
 	    try (PrintWriter pwo = new PrintWriter(new FileOutputStream(objectsFile))) {
 			pwo.println(this.generateObjectLayer(-1, ""));
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_error_export_map") + e.getMessage(), loc.getString("dialog_save_error"),
+			JOptionPane.showMessageDialog(tileCanvas.getTileEditor().getMainFrame(), 
+					loc.getString("dialog_error_export_map") + e.getMessage(), 
+					loc.getString("dialog_save_error"),
 					JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
@@ -422,12 +436,16 @@ public class MapExporter {
 	    try (PrintWriter pwn = new PrintWriter(new FileOutputStream(npcsFile))) {
 			pwn.println(this.generateNpcLayer(-1, ""));
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_error_export_map") + e.getMessage(), loc.getString("dialog_save_error"),
+			JOptionPane.showMessageDialog(tileCanvas.getTileEditor().getMainFrame(), 
+					loc.getString("dialog_error_export_map") + e.getMessage(), 
+					loc.getString("dialog_save_error"),
 					JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
 	    
-		JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_tile_export_success") + file.getName(), loc.getString("dialog_save_success"),
+		JOptionPane.showMessageDialog(tileCanvas.getTileEditor().getMainFrame(), 
+				loc.getString("dialog_tile_export_success") + file.getName(), 
+				loc.getString("dialog_save_success"),
 				JOptionPane.INFORMATION_MESSAGE);
 	}
 	
@@ -445,7 +463,9 @@ public class MapExporter {
 	    try (PrintWriter pwt = new PrintWriter(new FileOutputStream(tilesFile))) {
 			pwt.println(this.generateLvlTileMap());
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_error_export_map") + e.getMessage(), loc.getString("messages_en.properties"),
+			JOptionPane.showMessageDialog(tileCanvas.getTileEditor().getMainFrame(), 
+					loc.getString("dialog_error_export_map") + e.getMessage(), 
+					loc.getString("messages_en.properties"),
 					JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
@@ -453,7 +473,9 @@ public class MapExporter {
 	    try (PrintWriter pwo = new PrintWriter(new FileOutputStream(objectsFile))) {
 			pwo.println(this.generateLvlObjectMap());
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_error_export_map") + e.getMessage(), loc.getString("messages_en.properties"),
+			JOptionPane.showMessageDialog(tileCanvas.getTileEditor().getMainFrame(), 
+					loc.getString("dialog_error_export_map") + e.getMessage(), 
+					loc.getString("messages_en.properties"),
 					JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
@@ -461,12 +483,16 @@ public class MapExporter {
 	    try (PrintWriter pwn = new PrintWriter(new FileOutputStream(npcsFile))) {
 			pwn.println(this.generateLvlNpcMap());
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_error_export_map") + e.getMessage(), loc.getString("dialog_save_error"),
+			JOptionPane.showMessageDialog(tileCanvas.getTileEditor().getMainFrame(), 
+					loc.getString("dialog_error_export_map") + e.getMessage(), 
+					loc.getString("dialog_save_error"),
 					JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
 	    
-		JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_tile_export_success") + file.getName(), loc.getString("dialog_save_success"),
+		JOptionPane.showMessageDialog(tileCanvas.getTileEditor().getMainFrame(), 
+				loc.getString("dialog_tile_export_success") + file.getName(), 
+				loc.getString("dialog_save_success"),
 				JOptionPane.INFORMATION_MESSAGE);
 	}
 
@@ -567,9 +593,12 @@ public class MapExporter {
 
 		//determine the file extension
 		file = Utils.addFileType(file, Utils.TXT_FILE_EXTENSION);
-
+		
+		boolean isActive = Utils.loadIDFilterState(tileCanvas.getTileEditor().getLoadedSetup().getResourceBasePath());
 		//use PrintWriter to write human readable text
 		try (PrintWriter pw = new PrintWriter(new FileOutputStream(file))) {
+			//save the state of the load IDs list
+			pw.println("# ACTIVE: " + isActive);
 			//write tile IDs
 			pw.println("# Note: Existing Autotile IDs are not saved in this file... Keep in mind.\n");
 			pw.println("# Tiles IDs (" + tiles.size() + "):");
@@ -596,7 +625,9 @@ public class MapExporter {
 			}
 			
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_error_map_save") + e.getMessage(), loc.getString("dialog_save_error"),
+			JOptionPane.showMessageDialog(tileCanvas.getTileEditor().getMainFrame(), 
+					loc.getString("dialog_error_map_save") + e.getMessage(), 
+					loc.getString("dialog_save_error"),
 					JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
@@ -615,7 +646,9 @@ public class MapExporter {
 	    
 	    //check if the reduced image is still too large just as a safety check
 	    if (calculatedWidth > Integer.MAX_VALUE || calculatedHeight > Integer.MAX_VALUE || calculatedWidth * calculatedHeight > Integer.MAX_VALUE) {
-	        JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_error_map_too_large"), loc.getString("dialog_export_error"), JOptionPane.ERROR_MESSAGE);
+	        JOptionPane.showMessageDialog(tileCanvas.getTileEditor().getMainFrame(), 
+	        		loc.getString("dialog_error_map_too_large"), 
+	        		loc.getString("dialog_export_error"), JOptionPane.ERROR_MESSAGE);
 	        return; 
 	    }
 	    
@@ -696,11 +729,15 @@ public class MapExporter {
 	        }
 
 	        ImageIO.write(exportImage, format, file);
-	        JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_export_success_image") + file.getName(), loc.getString("dialog_export_success"),
+	        JOptionPane.showMessageDialog(tileCanvas.getTileEditor().getMainFrame(), 
+	        		loc.getString("dialog_export_success_image") + file.getName(), 
+	        		loc.getString("dialog_export_success"),
 	                JOptionPane.INFORMATION_MESSAGE);
 
 	    } catch (IOException e) {
-	        JOptionPane.showMessageDialog(canvasRenderer, loc.getString("dialog_error_export_image") + e.getMessage(), loc.getString("dialog_export_error"),
+	        JOptionPane.showMessageDialog(tileCanvas.getTileEditor().getMainFrame(), 
+	        		loc.getString("dialog_error_export_image") + e.getMessage(), 
+	        		loc.getString("dialog_export_error"),
 	                JOptionPane.ERROR_MESSAGE);
 	    } finally {
 	        g2d.dispose();

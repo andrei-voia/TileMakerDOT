@@ -1,5 +1,6 @@
 package utils;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
@@ -7,6 +8,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -20,7 +23,9 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 
 import core.Tile;
 import localization.LocalizationManager;
@@ -30,6 +35,7 @@ public final class Utils {
 	private Utils(){}
 	
     public static final String DEFAULT_BASE_PATH = "assets";
+    public static final String ASSETS_SETTINGS_PATH = DEFAULT_BASE_PATH + "/settings/";
     
     public static final String TILES_NAME = "tiles";
     public static final String OBJECTS_NAME = "objects";
@@ -152,24 +158,36 @@ public final class Utils {
 	    }
 	}
 	
-    public static JDialog createLoadingDialog(JFrame parent) {
+	public static JDialog createLoadingDialog(JFrame parent) {
     	LocalizationManager loc = LocalizationManager.getInstance();
         JDialog loadingDialog = new JDialog(parent, loc.getString("loading_title"), true); //true makes it modal
         loadingDialog.setUndecorated(true); //remove borders of the tool to look better and cleaner
         
         //add a simple label or message
         JLabel message = new JLabel(loc.getString("loading_message"), SwingConstants.CENTER);
-        message.setBorder(BorderFactory.createEmptyBorder(20, 40, 20, 40));
-        loadingDialog.add(message);
-        
-        loadingDialog.pack();
-        loadingDialog.setLocationRelativeTo(parent); //center it relative to the main frame location
-        
-        return loadingDialog;
-    }
+
+	    //main container panel to hold background, line border and inner margin
+	    JPanel contentPanel = new JPanel(new BorderLayout());
+	    
+	    //combine an outer line border with inner margin
+	    contentPanel.setBorder(BorderFactory.createCompoundBorder(
+	        BorderFactory.createLineBorder(UIManager.getColor("Component.borderColor") != null 
+	            ? UIManager.getColor("Component.borderColor") 
+	            : Color.GRAY, 1),
+	        BorderFactory.createEmptyBorder(20, 40, 20, 40)
+	    ));
+	    
+	    contentPanel.add(message, BorderLayout.CENTER);
+	    loadingDialog.setContentPane(contentPanel);
+
+	    loadingDialog.pack();
+	    loadingDialog.setLocationRelativeTo(parent);
+
+	    return loadingDialog;
+	}
     
     public static void saveInitialDefaultValue(String fileName, String value) {
-        File file = new File("assets/settings/" + fileName);
+        File file = new File(ASSETS_SETTINGS_PATH + fileName);
         
         //ensure the directory exists so we do not get a FileNotFoundException
         File parentDir = file.getParentFile();
@@ -264,7 +282,7 @@ public final class Utils {
     //reads the asset path from default_assets_path.txt located in the project root 
     //falling back to "assets" if the file does not exist or is empty
     public static String loadInitialDefaultValues(String fileName) {
-        File file = new File("assets/settings/" + fileName);
+        File file = new File(ASSETS_SETTINGS_PATH + fileName);
         String defaultPath = "assets";
         
         try (Scanner scanner = new Scanner(file)) {
@@ -284,7 +302,7 @@ public final class Utils {
     
     public static List<String> loadDefaultGridSizes() {
         List<String> sizes = new ArrayList<>();
-        File file = new File("assets/settings/default_grids.txt");
+        File file = new File(ASSETS_SETTINGS_PATH + "default_grids.txt");
 
         try (Scanner scanner = new Scanner(file)) {
             while (scanner.hasNextLine()) {
@@ -302,10 +320,10 @@ public final class Utils {
         return sizes;
     }
     
-	public static int loadMapTileSize(File file) {
+	public static int loadMapTileSize(File file, JFrame frame) {
 		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
 
-			// read dimensions
+			//read dimensions
 			String line = br.readLine();
 			if (line == null) {
 				throw new IOException("Map file is empty or corrupted.");
@@ -315,20 +333,20 @@ public final class Utils {
 				throw new IOException("Missing map dimensions in the file.");
 			}
 
-			// read the tile size
+			//read the tile size
 			line = br.readLine();
 			line = br.readLine();
 			
 			return Integer.parseInt(line.trim());
 			
 		} catch (FileNotFoundException e) {
-			JOptionPane.showMessageDialog(null, 
+			JOptionPane.showMessageDialog(frame, 
 					LocalizationManager.getInstance().getString("dialog_file_not_found"), 
 					LocalizationManager.getInstance().getString("dialog_load_error"), 
 					JOptionPane.ERROR_MESSAGE);
 			System.exit(0);
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(null, 
+			JOptionPane.showMessageDialog(frame, 
 					LocalizationManager.getInstance().getString("dialog_error_map_reading") + e.getMessage(), 
 					LocalizationManager.getInstance().getString("dialog_load_error"),
 					JOptionPane.ERROR_MESSAGE);
@@ -337,5 +355,87 @@ public final class Utils {
 		}
 		
 		return -1;
+	}
+	
+	//initialize translations in all languages for buttons in dialog windows
+	public static void initLocalizedDialogs() {
+        //generally set all those buttons to use the translated text wherever they will be used
+        UIManager.put("OptionPane.okButtonText", LocalizationManager.getInstance().getString("button_ok"));
+        UIManager.put("OptionPane.cancelButtonText", LocalizationManager.getInstance().getString("button_cancel"));
+        UIManager.put("OptionPane.yesButtonText", LocalizationManager.getInstance().getString("button_yes"));
+        UIManager.put("OptionPane.noButtonText", LocalizationManager.getInstance().getString("button_no"));
+        UIManager.put("OptionPane.messageDialogTitle", LocalizationManager.getInstance().getString("dialog_default_title"));
+        
+        //dialog titles
+        UIManager.put("FileChooser.openDialogTitleText", LocalizationManager.getInstance().getString("dialog_open_title"));
+        UIManager.put("FileChooser.saveDialogTitleText", LocalizationManager.getInstance().getString("dialog_save_title"));
+        UIManager.put("FileChooser.openButtonText", LocalizationManager.getInstance().getString("button_open"));
+        UIManager.put("FileChooser.saveButtonText", LocalizationManager.getInstance().getString("button_save"));
+        UIManager.put("FileChooser.cancelButtonText", LocalizationManager.getInstance().getString("button_cancel"));
+	}
+	
+	public static boolean loadIDFilterState(String basePath) {
+	    java.io.File file = new java.io.File(basePath + "/settings/default_used_ids_list.txt");
+	    if (!file.exists()) {
+	        createDefaultIDsFile(file, false);
+	        return false;
+	    }
+	    try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+	        String line;
+	        while ((line = reader.readLine()) != null) {
+	            line = line.trim();
+	            if (line.startsWith("# ACTIVE:")) {
+	                return Boolean.parseBoolean(line.substring("# ACTIVE:".length()).trim());
+	            }
+	        }
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    }
+	    return false;
+	}
+
+	public static void saveIDFilterState(String basePath, boolean active) {
+	    java.io.File file = new java.io.File(basePath + "/settings/default_used_ids_list.txt");
+	    if (!file.exists()) {
+	        createDefaultIDsFile(file, active);
+	        return;
+	    }
+	    try {
+	        List<String> lines = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
+	        boolean found = false;
+	        for (int i = 0; i < lines.size(); i++) {
+	            if (lines.get(i).trim().startsWith("# ACTIVE:")) {
+	                lines.set(i, "# ACTIVE: " + active);
+	                found = true;
+	                break;
+	            }
+	        }
+	        if (!found) {
+	            lines.add(0, "# ACTIVE: " + active);
+	        }
+	        Files.write(file.toPath(), lines, StandardCharsets.UTF_8);
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    }
+	}
+
+	private static void createDefaultIDsFile(java.io.File file, boolean active) {
+	    try {
+	        if (file.getParentFile() != null) {
+	            file.getParentFile().mkdirs();
+	        }
+	        List<String> lines = new ArrayList<>();
+	        lines.add("# ACTIVE: " + active);
+	        lines.add("# Note: Existing Autotile IDs are not saved in this file... Keep in mind.");
+	        lines.add("");
+	        lines.add("# Tiles IDs (0):");
+	        lines.add("");
+	        lines.add("# Objects IDs (0):");
+	        lines.add("");
+	        lines.add("# NPCs IDs (0):");
+	        Files.write(file.toPath(), lines, StandardCharsets.UTF_8);
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    }
 	}
 }

@@ -217,6 +217,25 @@ public class EditorMenuBar {
             }
         });
         
+        JMenuItem updateDefaultIds = new JMenuItem(loc.getString("menu_update_default_ids"));
+        updateDefaultIds.setToolTipText(loc.getString("menu_update_default_ids_tooltip"));
+        updateDefaultIds.setAccelerator(keybind.getKeyStroke("action.save_ids"));
+        updateDefaultIds.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(
+                frame,
+                loc.getString("menu_update_default_ids_confirm"),
+                loc.getString("menu_update_default_ids_title"),
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE
+            );
+            
+            if (confirm == JOptionPane.YES_OPTION) {
+                File defaultFile = new File(resourceBasePath, "settings/default_used_ids_list.txt");
+                canvas.getMapExporter().exportTileIdsList(defaultFile);
+                canvas.getToastNotification().showToastNotification(loc.getString("toast_default_ids_updated"));
+            }
+        });
+        
         JMenuItem spriteSheetImport = new JMenuItem(loc.getString("menu_import_spritesheet"));
         spriteSheetImport.setToolTipText(loc.getString("menu_import_spritesheet_tooltip"));
         spriteSheetImport.setAccelerator(keybind.getKeyStroke("action.import_spritesheet"));
@@ -239,6 +258,7 @@ public class EditorMenuBar {
         fileMenu.add(exportJsonFormat);
         fileMenu.addSeparator();
         fileMenu.add(exportIds);
+        fileMenu.add(updateDefaultIds);
         fileMenu.add(exportItem);
         
         //edit menu
@@ -843,6 +863,7 @@ public class EditorMenuBar {
                 exportJsonFormat.setAccelerator(keybind.getKeyStroke("action.export_json"));
                 exportItem.setAccelerator(keybind.getKeyStroke("action.export_png"));
                 exportIds.setAccelerator(keybind.getKeyStroke("action.export_ids"));
+                updateDefaultIds.setAccelerator(keybind.getKeyStroke("action.save_ids"));
                 spriteSheetImport.setAccelerator(keybind.getKeyStroke("action.import_spritesheet"));
 
                 refreshAssetsItem.setAccelerator(keybind.getKeyStroke("action.refresh_assets"));

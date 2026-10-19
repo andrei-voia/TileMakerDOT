@@ -85,19 +85,27 @@ public class MapLoader {
 			
 			tileCanvas.getTileEditor().getStatusInfoBar().updateStatusUI();
 
-			JOptionPane.showMessageDialog(null, loc.getString("dialog_chunk_load_success") + file.getName(), loc.getString("dialog_load_success"),
+			JOptionPane.showMessageDialog(tileCanvas.getCanvasRenderer(), 
+					loc.getString("dialog_chunk_load_success") + file.getName(), 
+					loc.getString("dialog_load_success"),
 					JOptionPane.INFORMATION_MESSAGE);
 
 		} catch (FileNotFoundException e) {
-			JOptionPane.showMessageDialog(null, loc.getString("dialog_file_not_found"), loc.getString("dialog_load_error"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(tileCanvas.getCanvasRenderer(), 
+					loc.getString("dialog_file_not_found"), 
+					loc.getString("dialog_load_error"), JOptionPane.ERROR_MESSAGE);
 			System.exit(0);
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(null, loc.getString("dialog_error_map_reading") + e.getMessage(), loc.getString("dialog_load_error"),
+			JOptionPane.showMessageDialog(tileCanvas.getCanvasRenderer(), 
+					loc.getString("dialog_error_map_reading") + e.getMessage(), 
+					loc.getString("dialog_load_error"),
 					JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 			System.exit(0);
 		} catch (NumberFormatException e) {
-			JOptionPane.showMessageDialog(null, loc.getString("dialog_error_map_non_numeric"), loc.getString("dialog_load_error"),
+			JOptionPane.showMessageDialog(tileCanvas.getCanvasRenderer(), 
+					loc.getString("dialog_error_map_non_numeric"), 
+					loc.getString("dialog_load_error"),
 					JOptionPane.ERROR_MESSAGE);
 			System.exit(0);
 		}
@@ -164,19 +172,27 @@ public class MapLoader {
 			tileCanvas.getHistoryFunction().resetSaveState();
 			
 			canvasRenderer.repaint();
-			JOptionPane.showMessageDialog(null, loc.getString("dialog_map_load_success") + file.getName(), loc.getString("dialog_load_success"),
+			JOptionPane.showMessageDialog(tileCanvas.getCanvasRenderer(), 
+					loc.getString("dialog_map_load_success") + file.getName(), 
+					loc.getString("dialog_load_success"),
 					JOptionPane.INFORMATION_MESSAGE);
 
 		} catch (FileNotFoundException e) {
-			JOptionPane.showMessageDialog(null, loc.getString("dialog_file_not_found"), loc.getString("dialog_load_error"), JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(tileCanvas.getCanvasRenderer(), 
+					loc.getString("dialog_file_not_found"), 
+					loc.getString("dialog_load_error"), JOptionPane.ERROR_MESSAGE);
 			System.exit(0);
 		} catch (IOException e) {
-			JOptionPane.showMessageDialog(null, loc.getString("dialog_error_map_reading") + e.getMessage(), loc.getString("dialog_load_error"),
+			JOptionPane.showMessageDialog(tileCanvas.getCanvasRenderer(), 
+					loc.getString("dialog_error_map_reading") + e.getMessage(), 
+					loc.getString("dialog_load_error"),
 					JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 			System.exit(0);
 		} catch (NumberFormatException e) {
-			JOptionPane.showMessageDialog(null, loc.getString("dialog_error_map_non_numeric"), loc.getString("dialog_load_error"),
+			JOptionPane.showMessageDialog(tileCanvas.getCanvasRenderer(), 
+					loc.getString("dialog_error_map_non_numeric"), 
+					loc.getString("dialog_load_error"),
 					JOptionPane.ERROR_MESSAGE);
 			System.exit(0);
 		}
@@ -292,7 +308,8 @@ public class MapLoader {
 			    errorMessage.deleteCharAt(errorMessage.length() - 1);
 			}
 			
-			JOptionPane.showMessageDialog(null, errorMessage.toString(),
+			JOptionPane.showMessageDialog(tileCanvas.getCanvasRenderer(), 
+					errorMessage.toString(),
 					loc.getString("dialog_missing_assets"), JOptionPane.WARNING_MESSAGE);
 		}
 	}

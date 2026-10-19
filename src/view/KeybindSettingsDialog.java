@@ -164,6 +164,7 @@ public class KeybindSettingsDialog extends JDialog {
             case "action.export_csv": return loc.getString("menu_export_csv");
             case "action.export_json": return loc.getString("menu_export_json");
             case "action.export_ids": return loc.getString("menu_export_ids");
+            case "action.save_ids": return loc.getString("menu_update_default_ids");
             case "action.export_png": return loc.getString("menu_export_png");
             
             case "action.undo": return loc.getString("menu_undo");
@@ -210,8 +211,6 @@ public class KeybindSettingsDialog extends JDialog {
     private void promptNewKeybind(String actionKey, int row) {
         JDialog captureDialog = new JDialog(this, loc.getString("keybind_new_key_title"), true);
         
-        captureDialog.setLocationRelativeTo(this);
-        
         JLabel label = new JLabel(loc.getString("keybind_new_key_message"), SwingConstants.CENTER);
         //add padding around the label so the text is not flush against the window borders
         label.setBorder(javax.swing.BorderFactory.createEmptyBorder(20, 30, 20, 30));
@@ -220,7 +219,9 @@ public class KeybindSettingsDialog extends JDialog {
         //calculates window dimensions dynamically based on label content
         captureDialog.pack();
         
-
+        //this sets the position central relative to the main class KeybindSettingsDialog
+        captureDialog.setLocationRelativeTo(this);
+        
         captureDialog.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {

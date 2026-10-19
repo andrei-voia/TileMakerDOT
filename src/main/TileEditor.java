@@ -1,6 +1,7 @@
 package main;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -11,7 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.ImageIcon;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -21,21 +24,28 @@ import javax.swing.JTabbedPane;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import core.Tile;
 import localization.LocalizationManager;
 import tools.SearchFieldFunction;
 import utils.ApplicationLegend;
 import utils.IDLoader;
+import utils.RecentFileManager;
 import utils.Utils;
 import view.TileCanvas;
+import view.WelcomePanel;
 
 public class TileEditor {
-	
-    private TileCanvas canvas;
-    
-    private ApplicationLegend applicationLegend;    
+
+    private CardLayout rootCardLayout;
+    private JPanel rootPanel;
+    private JPanel editorContainer;
+    private File pendingFileToLoad;
     private EditorWindow editorWindow;
+
+    private TileCanvas canvas;
+    private ApplicationLegend applicationLegend;    
     
     private ResourceLoaderWorker resourceWorker;
     private EditorMenuBar editorMenuBar;
@@ -52,145 +62,171 @@ public class TileEditor {
     private JTabbedPane npcTabs;
     
     //used to read the parsed tool parameters for loading saved files
+    private JFrame mainFrame;
     private static String[] PARAM_ARGS;
-    
+
     public static void main(String[] args) {
-    	PARAM_ARGS = args;
-    	
-        //ensures the GUI runs on the Event Dispatch Thread
+    	//ensures the GUI runs on the Event Dispatch Thread
+        PARAM_ARGS = args;
         SwingUtilities.invokeLater(() -> new TileEditor().createAndShowGUI());
     }
-    
+
     private void createAndShowGUI() {
-    	//load initial setup and input dialog
-    	loadedSetup = new LoadedSetup(this);
-
-        //get grid size and tile size
-        String[] inputs;
+    	//create the main frame
+        mainFrame = new JFrame("TileMaker DOT");
         
+        //sets the icon on the window title bar and task bar
+        File iconFile = new File(WelcomePanel.APP_ICON_PATH);
+        if (iconFile.exists()) {
+            mainFrame.setIconImage(new ImageIcon(iconFile.getAbsolutePath()).getImage());
+        }
+        
+        mainFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        mainFrame.setSize(1200, 750);
+        mainFrame.setLocationRelativeTo(null); //centers the window on screen
+
+        //close application when window X is clicked on Welcome Screen
+        mainFrame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if (canvas == null) {
+                    System.exit(0);
+                } else {
+                    if (canvas.getMapState().getCacheData().getCachedSavedLocation() == null || canvas.getMapState().getCacheData().isCanQuickSave()) {
+                        confirmExit(mainFrame);
+                    } else {
+                        mainFrame.dispose();
+                        System.exit(0);
+                    }
+                }
+            }
+        });
+
+        rootCardLayout = new CardLayout();
+        rootPanel = new JPanel(rootCardLayout);
+
+        //load initial setup and input dialog
+        loadedSetup = new LoadedSetup(this);
+        //initialize the application legend text
+        applicationLegend = new ApplicationLegend();
+
+        WelcomePanel welcomePanel = new WelcomePanel(new WelcomePanel.WelcomeActionListener() {
+            @Override
+            public void onNewMap() {
+                handleNewMap();
+            }
+
+            @Override
+            public void onOpenMap() {
+                JFileChooser chooser = new JFileChooser();
+                chooser.setFileFilter(new FileNameExtensionFilter("TileMaker DOT Map (*.tmdot)", "tmdot"));
+                if (chooser.showOpenDialog(mainFrame) == JFileChooser.APPROVE_OPTION) {
+                    handleLoadMap(chooser.getSelectedFile());
+                }
+            }
+
+            @Override
+            public void onLoadRecent(File mapFile) {
+                handleLoadMap(mapFile);
+            }
+        });
+
+        rootPanel.add(welcomePanel, "WELCOME_SCREEN");
+        mainFrame.add(rootPanel);
+        mainFrame.setVisible(true);
+
         //normal application start
-        if(!appParamsExist()) {
-            //create the starting window where you can edit your input before using this tool
-            editorWindow = new EditorWindow(this);
-            
-        	inputs = editorWindow.showGridSizeSelectionDialog(loadedSetup.getDefaultSizes(), 
-        			loadedSetup.getTileSizeLoaded(), 
-        			Long.toString(loadedSetup.getFrameDuration()));
+        if (appParamsExist()) {
+            File fileToLoad = extractFileFromParamArgs();
+            handleLoadMap(fileToLoad);
         }
-        //in case a map path was parsed and loaded directly
-        else {
-        	inputs = new String[]{loadedSetup.getDefaultSizes().get(0), 
-        			loadedSetup.getTileSizeLoaded(), 
-        			Boolean.toString(false), 
-        			Long.toString(loadedSetup.getFrameDuration())};
-        	
-        	//we set this here now because we do not make the editor window anymore
-        	loadedSetup.setOldResourceBasePath(loadedSetup.getResourceBasePath());
-            //store the path for later use in loading methods
-        	loadedSetup.setResourceBasePath(loadedSetup.getResourceBasePath());
-        	
-        	//read the tile size from the loaded map
-        	File fileToLoad = extractFileFromParamArgs();
-        	int loadedMapTileSize = Utils.loadMapTileSize(fileToLoad);
-        	
-        	//check if the tile size from assets coincide with the tile size from loaded map
-        	if(Integer.parseInt(loadedSetup.getTileSizeLoaded()) != loadedMapTileSize) {
-        		//show a new window with a warning that lets the user to correct the assets path if needed
-            	AssetPathWindow pathWindow = new AssetPathWindow(loadedSetup.getResourceBasePath(),
-            			loadedMapTileSize, Integer.parseInt(loadedSetup.getTileSizeLoaded()));
-            	String[] result = pathWindow.showPathSelectionDialog();
+    }
 
-            	if (result != null) {
-            	    String selectedTileSize = result[0];
-            	    String selectedAssetsPath = result[1];
-            	    
-                	//if the user changed the assets path then we save the new path
-                	if(selectedAssetsPath != null) {
-                    	//we set this here now because we do not make the editor window anymore
-                    	loadedSetup.setOldResourceBasePath(loadedSetup.getResourceBasePath());
-                        //store the path for later use in loading methods
-                    	loadedSetup.setResourceBasePath(selectedAssetsPath);
-                	}
-                	
-                	//also set the new tile size if the user changed it
-                	inputs = new String[]{loadedSetup.getDefaultSizes().get(0), 
-                			selectedTileSize, 
-                			Boolean.toString(false), 
-                			Long.toString(loadedSetup.getFrameDuration())};
-            	}
-        	}
+    private void handleNewMap() {
+        editorWindow = new EditorWindow(this);
+        String[] inputs = editorWindow.showGridSizeSelectionDialog(
+            loadedSetup.getDefaultSizes(), 
+            loadedSetup.getTileSizeLoaded(), 
+            Long.toString(loadedSetup.getFrameDuration())
+        );
+
+        if (inputs != null && inputs.length == 4) {
+            launchEditorWorker(inputs, null);
         }
-        
-        if (inputs == null || inputs.length != 4 || !inputs[0].matches("\\d+x\\d+") || !inputs[1].matches("\\d+")) {
-            return;
+    }
+
+    private void handleLoadMap(File fileToLoad) {
+        RecentFileManager.addRecentFile(fileToLoad.getAbsolutePath());
+
+        loadedSetup.setOldResourceBasePath(loadedSetup.getResourceBasePath());
+        loadedSetup.setResourceBasePath(loadedSetup.getResourceBasePath());
+
+        int loadedMapTileSize = Utils.loadMapTileSize(fileToLoad, mainFrame);
+        boolean savedIDFilterState = Utils.loadIDFilterState(loadedSetup.getResourceBasePath());
+
+        String[] inputs = new String[]{
+            loadedSetup.getDefaultSizes().get(0), 
+            loadedSetup.getTileSizeLoaded(), 
+            String.valueOf(savedIDFilterState), 
+            Long.toString(loadedSetup.getFrameDuration())
+        };
+
+        if (Integer.parseInt(loadedSetup.getTileSizeLoaded()) != loadedMapTileSize) {
+            AssetPathWindow pathWindow = new AssetPathWindow(
+                loadedSetup.getResourceBasePath(), 
+                loadedMapTileSize, 
+                Integer.parseInt(loadedSetup.getTileSizeLoaded()),
+                this
+            );
+            String[] result = pathWindow.showPathSelectionDialog();
+
+            if (result != null) {
+                if (result[1] != null) {
+                    loadedSetup.setOldResourceBasePath(loadedSetup.getResourceBasePath());
+                    loadedSetup.setResourceBasePath(result[1]);
+                }
+                inputs[1] = result[0];
+            } else {
+                return;
+            }
         }
-        
-        if(inputs[2].equals("true")) {
-        	File idLoaderPath = new File(loadedSetup.getOldResourceBasePath() + "/settings/" + "default_used_ids_list.txt");
-        	if (idLoaderPath.exists() && idLoaderPath.isFile()) {
-        		idLoader = new IDLoader();
-        		idLoader.loadUniqueIDsList(idLoaderPath);
-        	} else {
-        		idLoader = null;
-        	    //the file is missing
-        	    System.out.println("\"default_used_ids_list.txt\" file not found. Skipping unique ID loading.");
-        	}
+
+        launchEditorWorker(inputs, fileToLoad);
+    }
+
+    private void launchEditorWorker(String[] inputs, File fileToLoad) {
+        if (inputs[2].equals("true")) {
+            File idLoaderPath = new File(loadedSetup.getOldResourceBasePath() + "/settings/" + "default_used_ids_list.txt");
+            if (idLoaderPath.exists() && idLoaderPath.isFile()) {
+                idLoader = new IDLoader();
+                idLoader.loadUniqueIDsList(idLoaderPath);
+            } else {
+                idLoader = null;
+            }
         }
-        
+
         long newFrameDuration = Long.parseLong(inputs[3]);
-        if(newFrameDuration != loadedSetup.getFrameDuration()) {
-        	loadedSetup.setFrameDuration(newFrameDuration);
-        	//save the new frame duration animation inside the corresponding .txt file
-        	Utils.saveInitialDefaultValue("default_frame_ms_duration.txt", String.valueOf(loadedSetup.getFrameDuration()));
+        if (newFrameDuration != loadedSetup.getFrameDuration()) {
+            loadedSetup.setFrameDuration(newFrameDuration);
+            Utils.saveInitialDefaultValue("default_frame_ms_duration.txt", String.valueOf(loadedSetup.getFrameDuration()));
         }
-        
-        //create the main frame
-        JFrame frame = new JFrame("TileMaker DOT");
-        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+
+        this.pendingFileToLoad = fileToLoad;
 
         //create and show the loading screen
-        JDialog loadingDialog = Utils.createLoadingDialog(frame);
-        //position it in the center of the screen
-        loadingDialog.setLocationRelativeTo(null);
-        
+        JDialog loadingDialog = Utils.createLoadingDialog(mainFrame);
+        loadingDialog.setLocationRelativeTo(mainFrame);
+
         //use a timer to show the dialog slightly later if needed for now keep it 0
         Timer showDialogTimer = new Timer(0, e -> loadingDialog.setVisible(true));
         showDialogTimer.setRepeats(false);
         showDialogTimer.start();
-        
-        //initialize the application legend text
-        applicationLegend = new ApplicationLegend();
-        
+
         //start the work on a background thread
-        resourceWorker = new ResourceLoaderWorker(frame, loadingDialog, inputs, this);
+        resourceWorker = new ResourceLoaderWorker(mainFrame, loadingDialog, inputs, this);
         resourceWorker.execute();
     }
-    
-    private void updateTabViewport(JTabbedPane mainContainer, JTabbedPane newSource) {
-        //wipe the old tabs categories clean
-        mainContainer.removeAll();
-        //loop through the new JTabbedPane and move its tabs to the main one
-        int tabCount = newSource.getTabCount();
-        for (int i = 0; i < tabCount; i++) {
-            String title = newSource.getTitleAt(0);
-            Component comp = newSource.getComponentAt(0);
-            mainContainer.addTab(title, comp);
-        }
-        
-        //help the GC
-        newSource = null;
-        
-        mainContainer.revalidate();
-        mainContainer.repaint();
-    }
-    
-    //a method that goes through the list of tabs shown (tiles, objects or NPCs) and saves all the tiles from it to a new list
-    public List<Tile> flattenCategoryMap(Map<String, List<Tile>> categories) {
-    	List<Tile> flatList = new ArrayList<>();
-        categories.values().forEach(flatList::addAll);
-        return flatList;
-    }
-    
+
     public void finishGUISetup(
         JFrame frame, 
         String[] inputs, 
@@ -199,74 +235,52 @@ public class TileEditor {
         Map<String, List<Tile>> npcCategories) {
     	
     	//this happens only when you refresh assets from the tool, does not enter on the first start of the tool
-    	if (canvas != null) {
-    	    //refresh the raw data lists
-    		resourceWorker.setAllTiles(flattenCategoryMap(tileCategories));
-    		resourceWorker.setAllObjects(flattenCategoryMap(objectCategories));
-    		resourceWorker.setAllNpcs(flattenCategoryMap(npcCategories));
+        if (canvas != null) {
+            resourceWorker.setAllTiles(flattenCategoryMap(tileCategories));
+            resourceWorker.setAllObjects(flattenCategoryMap(objectCategories));
+            resourceWorker.setAllNpcs(flattenCategoryMap(npcCategories));
 
-    	    //update canvas references
-    	    canvas.getMapState().loadNewTextures(resourceWorker.getAllTiles(), resourceWorker.getAllObjects(), resourceWorker.getAllNpcs());
+            canvas.getMapState().loadNewTextures(resourceWorker.getAllTiles(), resourceWorker.getAllObjects(), resourceWorker.getAllNpcs());
 
-    	    //update the UI
-    	    updateTabViewport(this.tileTabs, assetPalette.createTilePalette(tileCategories));
-    	    updateTabViewport(this.objectTabs, assetPalette.createObjectPalette(objectCategories, resourceWorker.getAllObjects()));
-    	    updateTabViewport(this.npcTabs, assetPalette.createNpcPalette(npcCategories, resourceWorker.getAllNpcs()));
+            updateTabViewport(this.tileTabs, assetPalette.createTilePalette(tileCategories));
+            updateTabViewport(this.objectTabs, assetPalette.createObjectPalette(objectCategories, resourceWorker.getAllObjects()));
+            updateTabViewport(this.npcTabs, assetPalette.createNpcPalette(npcCategories, resourceWorker.getAllNpcs()));
 
-			//if the autoTile is not active then do not reset autotileMap to save time
-			if (canvas.getCanvasViewState().isShowAutotile()) {
-				canvas.getMapState().refreshAutotileMap();
-			}
-    	    canvas.getMapState().refreshAllObjectsList();
-    	    
-    	    canvas.getCanvasRenderer().revalidate();
-    	    canvas.getCanvasRenderer().repaint();
-    	    return;
-    	}
+            if (canvas.getCanvasViewState().isShowAutotile()) {
+                canvas.getMapState().refreshAutotileMap();
+            }
+            canvas.getMapState().refreshAllObjectsList();
 
+            canvas.getCanvasRenderer().revalidate();
+            canvas.getCanvasRenderer().repaint();
+            return;
+        }
+        
         //parse input
         String[] parts = inputs[0].split("x");
         int cols = Integer.parseInt(parts[0]);
         int rows = Integer.parseInt(parts[1]);
         loadedSetup.setTileSize(Integer.parseInt(inputs[1]));
-        
+
         //save the new tile size inside the corresponding .txt file
-        if(Integer.parseInt(loadedSetup.getTileSizeLoaded()) != loadedSetup.getTileSize()) {
-        	Utils.saveInitialDefaultValue("default_tile_size.txt", String.valueOf(loadedSetup.getTileSize()));
+        if (Integer.parseInt(loadedSetup.getTileSizeLoaded()) != loadedSetup.getTileSize()) {
+            Utils.saveInitialDefaultValue("default_tile_size.txt", String.valueOf(loadedSetup.getTileSize()));
         }
-        
-		//add the window listener
-		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		
-		frame.addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent e) {
-				//call the custom exit confirmation method if unsaved progress
-				if (canvas != null && canvas.getMapState().getCacheData().getCachedSavedLocation() == null || canvas.getMapState().getCacheData().isCanQuickSave()) {
-					confirmExit(frame);
-				} else {
-					frame.dispose(); //clean up the window resources
-					System.exit(0); //terminate the application
-				}
-			}
-		});
 
         //icon loading section
         editorIcons = new EditorIcons(loadedSetup.getTileSize(), loadedSetup.getDefaultSelectedTile());
         //set the icon for the JFrame window
         frame.setIconImage(editorIcons.getIconImage());
-        
+
         //initialize canvas and scroll pane using the loaded tile size
         canvas = new TileCanvas(this, rows, cols, resourceWorker.getAllTiles(), resourceWorker.getAllObjects(), resourceWorker.getAllNpcs(), loadedSetup.getTileSize()); 
         JScrollPane canvasScroll = new JScrollPane(canvas.getCanvasRenderer());
         canvas.getCanvasRenderer().requestFocusInWindow();
-        
+
         assetPalette = new AssetPalette(this, canvas);
-        
         editorMenuBar = new EditorMenuBar(this, canvas, applicationLegend, inputs, loadedSetup);
-        
         statusInfoBar = new StatusInfoBar(this, canvas, editorMenuBar);
-        
+
         //attach the menu bar
         frame.setJMenuBar(editorMenuBar.createMenuBar(frame));
 
@@ -274,41 +288,38 @@ public class TileEditor {
         tileTabs = assetPalette.createTilePalette(tileCategories);
         objectTabs = assetPalette.createObjectPalette(objectCategories, resourceWorker.getAllObjects());
         npcTabs = assetPalette.createNpcPalette(npcCategories, resourceWorker.getAllNpcs());
-        
+
         statusInfoBar.initSelections();
         frame.add(statusInfoBar.getStatusBar(), BorderLayout.SOUTH);
-
         //force the editor to recalculate thumbnails and button highlights immediately
         statusInfoBar.updateStatusUI();
 
         //create a container panel for the search bar
         JPanel searchPanel = new JPanel(new BorderLayout(5, 0));
         searchPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-        
-        searchFieldFunction = new SearchFieldFunction(editorMenuBar, assetPalette,
-        		tileTabs, objectTabs, npcTabs);
+        searchFieldFunction = new SearchFieldFunction(editorMenuBar, assetPalette, tileTabs, objectTabs, npcTabs);
 
         //assemble the panel and add to the left side bar
         searchPanel.add(searchFieldFunction.getSearchField(), BorderLayout.CENTER);
         searchPanel.add(searchFieldFunction.getClearButton(), BorderLayout.EAST);
         searchPanel.add(searchFieldFunction.getSearchLabel(), BorderLayout.WEST);
-        
+
         LocalizationManager loc = LocalizationManager.getInstance();
-        
+
         //add the objects and NPCs tabs view
         JTabbedPane itemTabs = new JTabbedPane();
         itemTabs.addTab(loc.getString("objects_tab"), objectTabs);
         itemTabs.addTab(loc.getString("npcs_tab"), npcTabs);
-        
+
         //add the status down on the left side bar
         JPanel controlPanel = createControlPanel();
         controlPanel.add(statusInfoBar.getSelectionLabel());
         controlPanel.add(statusInfoBar.getSelectionPreview());
         controlPanel.add(statusInfoBar.getStatusBar());
-        
+
         //assemble the left side bar
         JPanel sidebar = new JPanel(new BorderLayout());
-        sidebar.add(searchPanel, BorderLayout.NORTH); //add a search bar at the top
+        sidebar.add(searchPanel, BorderLayout.NORTH);
         sidebar.add(itemTabs, BorderLayout.CENTER); 
         sidebar.add(controlPanel, BorderLayout.SOUTH); 
         sidebar.setPreferredSize(new Dimension(350, 600));
@@ -318,80 +329,82 @@ public class TileEditor {
         JSplitPane verticalSplit = new JSplitPane(JSplitPane.VERTICAL_SPLIT, canvasScroll, tileTabs);
         verticalSplit.setResizeWeight(1.0);
         verticalSplit.setDividerSize(6);
-        verticalSplit.setDividerLocation(640);
-        
+        //we also set it dynamically inside revalidateTimer, but it will be a split second before update
+        verticalSplit.setDividerLocation(616);
+
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, sidebar, verticalSplit);
         splitPane.setResizeWeight(0.0);
-        splitPane.setDividerLocation(360);
-        
-        frame.setLayout(new BorderLayout());
-        frame.add(splitPane, BorderLayout.CENTER);
-        frame.setSize(1300, 800);
-        
-        //show the frame
-        frame.setVisible(true);
-        
-        //show message if any hidden folders were found
-        if(!assetPalette.getHiddenFolders().isEmpty()) {
+        splitPane.setDividerLocation(350);
+
+        editorContainer = new JPanel(new BorderLayout());
+        editorContainer.add(splitPane, BorderLayout.CENTER);
+
+        rootPanel.add(editorContainer, "EDITOR_SCREEN");
+        rootCardLayout.show(rootPanel, "EDITOR_SCREEN");
+
+        if (!assetPalette.getHiddenFolders().isEmpty()) {
             JOptionPane.showMessageDialog(
-                    frame, loc.getFormattedString("hidden_folders_message", assetPalette.getHiddenFolders().toString()),
-                    loc.getString("hidden_folders_detected"), JOptionPane.INFORMATION_MESSAGE);
+                frame, loc.getFormattedString("hidden_folders_message", assetPalette.getHiddenFolders().toString()),
+                loc.getString("hidden_folders_detected"), JOptionPane.INFORMATION_MESSAGE);
         }
 
         //forced revalidation after GUI is visible
         Timer revalidateTimer = new Timer(100, e -> {
+        	int totalHeight = verticalSplit.getHeight();
+            if (totalHeight > 0) {
+            	//set the vertical height for the tiles panel to always be around 711 - 616 = 95
+                verticalSplit.setDividerLocation(totalHeight - 120);
+            }
+        	
             frame.revalidate();
             frame.repaint();
             ((Timer) e.getSource()).stop();
         });
         revalidateTimer.setRepeats(false);
         revalidateTimer.start();
-        
+
         //save the new assets location inside the corresponding .txt file
-        if(!loadedSetup.getOldResourceBasePath().equals(loadedSetup.getResourceBasePath())) {
-        	Utils.saveInitialDefaultValue("default_assets_path.txt", String.valueOf(loadedSetup.getResourceBasePath()));
+        if (!loadedSetup.getOldResourceBasePath().equals(loadedSetup.getResourceBasePath())) {
+            Utils.saveInitialDefaultValue("default_assets_path.txt", String.valueOf(loadedSetup.getResourceBasePath()));
         }
-        
-        //auto load saved map files from arguments
-        autoloadOpenedSavedFiles();
+
+        if (pendingFileToLoad != null && pendingFileToLoad.exists() && pendingFileToLoad.isFile()) {
+            canvas.getMapLoader().loadMap(pendingFileToLoad);
+            pendingFileToLoad = null;
+        }
     }
-    
+
+    private void updateTabViewport(JTabbedPane mainContainer, JTabbedPane newSource) {
+        mainContainer.removeAll();
+        int tabCount = newSource.getTabCount();
+        for (int i = 0; i < tabCount; i++) {
+            String title = newSource.getTitleAt(0);
+            Component comp = newSource.getComponentAt(0);
+            mainContainer.addTab(title, comp);
+        }
+        newSource = null;
+        mainContainer.revalidate();
+        mainContainer.repaint();
+    }
+
+    public List<Tile> flattenCategoryMap(Map<String, List<Tile>> categories) {
+        List<Tile> flatList = new ArrayList<>();
+        categories.values().forEach(flatList::addAll);
+        return flatList;
+    }
+
     private boolean appParamsExist() {
-    	if (PARAM_ARGS != null && PARAM_ARGS.length > 0) {
-    		return true;
-    	}
-    	return false;
+        return PARAM_ARGS != null && PARAM_ARGS.length > 0;
     }
-    
-    //method used to check if a saved file .tmdot was double clicked to open a map before opening the tool
-    private void autoloadOpenedSavedFiles() {
-        if (appParamsExist()) {
-        	File fileToLoad = extractFileFromParamArgs();
-            
-            //verify the file actually exists before trying to load
-            if (fileToLoad.exists() && fileToLoad.isFile()) {
-                System.out.println("Auto-loading project: " + fileToLoad.getAbsolutePath());
-                
-                //load the map
-                canvas.getMapLoader().loadMap(fileToLoad);
-            }
-        }
-    }
-    
+
     private File extractFileFromParamArgs() {
-        //join all arguments with a space to reconstruct paths that contain spaces
-        String fullPath = String.join(" ", PARAM_ARGS);
-        
-        //clean up any accidental double quotes Windows might wrap around it
-        fullPath = fullPath.replace("\"", ""); 
-        
-        File fileToLoad = new File(fullPath);
-        return fileToLoad;
+        String fullPath = String.join(" ", PARAM_ARGS).replace("\"", ""); 
+        return new File(fullPath);
     }
-    
+
     //displays a confirmation dialog and exits the application if the user confirms
     private void confirmExit(JFrame frame) {
-    	LocalizationManager loc = LocalizationManager.getInstance();
+        LocalizationManager loc = LocalizationManager.getInstance();
         int response = JOptionPane.showConfirmDialog(
             frame,
             loc.getString("exit_confirm_message"),
@@ -402,19 +415,21 @@ public class TileEditor {
 
         //if the user clicks yes then terminate the application
         if (response == JOptionPane.YES_OPTION) {
-            frame.dispose(); //clean up the window resources
-            System.exit(0);  //terminate the Java Virtual Machine
+        	//clean up the window resources
+            frame.dispose();
+            //terminate the Java Virtual Machine
+            System.exit(0);
         }
         //if the user clicks no or closes the dialog nothing happens and the application remains open
     }
-    
+
     //this panel serves as a container for the selection preview
     private JPanel createControlPanel() {
         JPanel controlPanel = new JPanel(new GridLayout(0, 1, 5, 5));
         controlPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
         return controlPanel;
     }
-    
+
 	public JTabbedPane getTileTabs() {
 		return tileTabs;
 	}
@@ -457,5 +472,9 @@ public class TileEditor {
 
 	public SearchFieldFunction getSearchFieldFunction() {
 		return searchFieldFunction;
+	}
+
+	public JFrame getMainFrame() {
+		return mainFrame;
 	}
 }

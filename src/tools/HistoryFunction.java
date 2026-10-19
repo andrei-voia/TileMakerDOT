@@ -14,7 +14,7 @@ public class HistoryFunction extends HistoryData {
 	
 	public HistoryFunction(TileCanvas tileCanvas, MapState mapState, 
 			CanvasViewState canvasViewState, CanvasRenderer canvasRenderer) {
-		super(mapState);
+		super(mapState, tileCanvas.getTileEditor().getMainFrame());
 		this.tileCanvas = tileCanvas;
 		this.canvasViewState = canvasViewState;
 		this.canvasRenderer = canvasRenderer;

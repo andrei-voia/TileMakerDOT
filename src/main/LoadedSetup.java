@@ -61,7 +61,7 @@ public class LoadedSetup {
 
         } catch(NumberFormatException e) {
         	LocalizationManager loc = LocalizationManager.getInstance();
-        	JOptionPane.showMessageDialog(null,
+        	JOptionPane.showMessageDialog(tileEditor.getMainFrame(),
         			loc.getString("dialog_invalid_load"),
         	        loc.getString("Configuration Error"),
         	        JOptionPane.WARNING_MESSAGE);
