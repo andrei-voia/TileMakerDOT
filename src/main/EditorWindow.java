@@ -195,8 +195,6 @@ public class EditorWindow {
         mainContainer.add(leftPanel, BorderLayout.WEST);
         mainContainer.add(rightPanel, BorderLayout.CENTER);
         
-        Utils.initLocalizedDialogs();
-        
         JOptionPane optionPane = new JOptionPane(
             mainContainer,
             JOptionPane.PLAIN_MESSAGE,

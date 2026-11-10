@@ -9,7 +9,7 @@ import javax.swing.JScrollPane;
 
 public class ApplicationLegend {
 	
-	public static final String APP_VERSION = "TileMaker DOT v2.7.0";
+	public static final String APP_VERSION = "TileMaker DOT v2.7.1";
 	
 	private JScrollPane scrollPane;
 	

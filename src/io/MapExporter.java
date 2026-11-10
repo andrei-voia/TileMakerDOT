@@ -624,6 +624,9 @@ public class MapExporter {
 				pw.println((r + 1) + ". " + npcs.get(r) + " (Name: " + tile.getName() + ")");
 			}
 			
+			//add a notification if successfully exported
+			tileCanvas.getToastNotification().showToastNotification(loc.getString("toast_export_ids_success"));
+			
 		} catch (IOException e) {
 			JOptionPane.showMessageDialog(tileCanvas.getTileEditor().getMainFrame(), 
 					loc.getString("dialog_error_map_save") + e.getMessage(), 

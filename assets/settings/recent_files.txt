@@ -1,0 +1,5 @@
+D:\main storage\Project TileMakerDOT\SavesFolder DEPRECATED\cozy_village.tmdot|-1
+D:\main storage\Project TileMakerDOT\SavesFolder\test32x32.tmdot|6
+D:\main storage\Project TileMakerDOT\SavesFolder\cozy_village.tmdot|6
+D:\main storage\Project TileMakerDOT\SavesFolder\cozy_interior.tmdot|8
+D:\main storage\Project TileMakerDOT\SavesFolder\sidewalk.tmdot|9

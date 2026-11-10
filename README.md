@@ -53,6 +53,7 @@ TileMaker DOT addresses common limitations found in traditional map editors by o
 | **Annotated Notes**      | Place persistent, color-coded pins directly onto map tiles to leave design memos, boundary and script reminders, or map out level design notes. | Keeps level design ideas, collaboration notes, and scripting instructions attached directly to the map canvas, scaling perfectly during meetings and game development. |
 | **Asset Analytics**      | Live tracking of grand totals, unique item counts, and density breakdowns for tiles, objects, and NPCs. | Helps identify high density areas and optimize map performance before exporting. |
 | **Custom Keybindings**   | Rebind any menu command or tool shortcut directly in the editor.                            | Adapts to custom developer workflows and prevents shortcut conflicts with other software. |
+| **Project Launcher**     | **Recent Projects & Custom Icons:** Quick launch recent maps with customizable project icons and history management. | Streamlines daily workflows and simplifies visual project tracking, making it easier to continue from where you left off. |
 ***
 
 ***
@@ -121,6 +122,13 @@ Objects and NPCs are placed based on the **top-left corner** of the image. When 
 When hovering over any asset in the asset selection UI view, a concise tooltip provides immediate details, including the asset's name, unique ID, and its exact size in tiles (for Objects and NPCs).
 
 ## 🛠️ Advanced Toolset
+
+### 📂 Welcome Hub & Custom Project Icons
+The startup launcher provides a centralized hub to manage and resume your work:
+* **Visual Identification:** Assign custom map icons to recent projects to quickly distinguish between different levels, biome maps, or test canvases.
+* **Custom Icon Flexibility:** Easily replace or update custom presets by dropping your own PNG files into the `assets/icons/recent_saves` folder (`tile_editor_save1.png` through `tile_editor_save9.png`).
+* **One-Click Quick Launch:** Reopen recent map files immediately upon launching without browsing directories.
+* **History Control:** Clear recent project history at any time directly from the header controls.
 
 ### 🖌️ Random Scatter Brush
 Select multiple items in the palette to activate **Brush Mode**. The editor will randomly cycle through your selection as you paint, creating natural, non-repetitive landscapes instantly.
@@ -194,6 +202,7 @@ The **`settings/`** folder contains text files used to modify default applicatio
 | `default_tile_size.txt`         | Sets the pixel size of a single tile. Objects and NPCs will be scaled proportional to this size. | A 128x128px house on a 64px tile map will occupy 2x2 tiles. |
 | `default_used_ids_list.txt`     | Whitelist Filter: A list of specific IDs the application is allowed to load. Useful for large asset folders where you only need a subset of items for a specific map. | Use the **Export Used IDs List** option in the app to automatically generate this file based on your current map. |
 | `factory_keybinds.txt`          | Read-only default keybinding template file. | Used the restore factory key shortcuts when clicking **Restore Defaults**. |
+| `recent_files.txt`              | Stores recently opened map file paths and their associated project icons for the welcome screen. | Auto-updated whenever a map is loaded or when project history is cleared. |
 
 ***
 
@@ -210,7 +219,8 @@ TileMaker DOT features a **Live-Sync Settings System**. While you can manually e
 | `default_keybinds.txt`          | Edit > Keybinding Settings     | ✅ Yes      |
 | `default_language.txt`          | Info > Language                | ✅ Yes      |
 | `default_tile_size.txt`         | Startup Tile Size Field        | ✅ Yes      |
-| `default_used_ids_list.txt`     | Manual File Edit Only          | ❌ No       |
+| `default_used_ids_list.txt`     | Manual File Edit Only          | ✅ Yes      |
+| `recent_files.txt`              | Welcome Screen / Recent        | ✅ Yes      |
 
 ### How it works:
 1. **Startup:** The app reads these files to configure your workspace.
@@ -229,6 +239,7 @@ The application requires a strict file structure to function correctly:
 ```text
 TileMaker DOT/
 ├── assets/
+│   ├── icons/
 │   ├── tiles/
 │   │   ├── autotiles/                   (Autotile textures go here)
 │   │   └── subfolders...                (Regular tile textures go here)
@@ -248,7 +259,8 @@ TileMaker DOT/
 │       ├── default_language.txt
 │       ├── default_tile_size.txt
 │       ├── default_used_ids_list.txt
-│       └── factory_keybinds.txt
+│       ├── factory_keybinds.txt
+│       └── recent_files.txt
 │
 ├── jdk-16.0.2/                          (Required for Windows)
 ├── jdk-macOS/                           (Required for macOS)
